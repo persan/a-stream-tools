@@ -49,7 +49,6 @@ package body Serialcomunication.Timed_Output_Streams is
       end if;
       Stream.Message_Time := Clock;
       Stream.Start_Time := Clock;
-
    end Create;
 
    -----------

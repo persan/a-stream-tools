@@ -9,6 +9,8 @@ package Serialcomunication.Timed_Output_Streams is
      (Stream  : in out Timed_Output_Stream;
       Path    : String;
       Output_Base : Ada.Text_IO.Number_Base := 16;
+      With_Header : Boolean := True;
+      Append      : Boolean := False;
       Spacing : Ada.Real_Time.Time_Span := Ada.Real_Time.To_Time_Span (0.1));
 
    not overriding procedure Close
@@ -35,6 +37,7 @@ private
       Message_Time : Ada.Real_Time.Time;
       Start_Time   : Ada.Real_Time.Time;
       Output_Base  : Ada.Text_IO.Number_Base;
+      With_Header  : Boolean;
    end record;
    not overriding procedure Write
      (Stream : in out Timed_Output_Stream);

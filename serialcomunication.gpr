@@ -1,0 +1,81 @@
+with "gnatcoll";
+project Serialcomunication is
+
+   for Languages use ("Ada", "Makefile", "Project File","Text"); -- , "Python");
+
+   for Main use ("serialcomunication-demo_main.adb");
+
+   for Source_Dirs use (".","src");
+   for Object_Dir use ".obj";
+
+   for Exec_Dir use "bin";
+
+   package Builder is
+      for Executable ("serialcomunication-demo_main.adb") use "main";
+      for Default_Switches ("Ada") use ("-s","-j0");
+   end Builder;
+
+   package Ide is
+      for Documentation_Dir use "doc";
+   end Ide;
+
+   package Make is
+      for Makefile use "Makefile";
+   end Make;
+
+
+ 
+   package Pretty_Printer is
+      for Default_Switches ("ada") use ("-c3", "-c4", "-c5", "-M128", "-N", "--no-separate-loop-then");
+   end Pretty_Printer;
+
+
+   package Compiler is
+      for Default_Switches ("Ada") use ("-gnat12",
+                                        "-gnateE", --   Generate extra information in exception messages
+                                        "-gnatf",--    Full errors. Verbose details, all undefined references
+                                        "-gnatq",  --    Don't quit, try semantics, even if parse errors
+                                        "-gnatQ",  --  Don't quit, write ali/tree file even if compile errors
+                                        "-gnatwa", -- Turn on most Warnings
+                                        "-gnaty3", --  check indentation
+                                        "-gnatya", --    check attribute casing
+                                        "-gnatyA", --    check array attribute indexes
+                                        "-gnatyb", --    check no blanks at end of lines
+                                        "-gnatyc", --    check comment format (two spaces)
+                                        "-gnatyd", --    check no DOS line terminators
+                                        "-gnatyf", --    check no form feeds/vertical tabs in source
+                                        "-gnatyg", --    check standard GNAT style rules
+                                        "-gnatyh", --    check no horizontal tabs in source
+                                        "-gnatyi", --    check if-then layout
+                                        "-gnatyk", --    check casing rules for keywords
+                                        "-gnatyl", --    check reference manual layout
+                                        "-gnatyL10", --  check max nest level < nn
+                                        "-gnatyn", --    check casing of package Standard identifiers
+                                        "-gnatyM256", --  check line length <= nn characters
+                                        "-gnatyO", --    check overriding indicators
+                                        "-gnatyp", --    check pragma casing
+                                        "-gnatyr", --    check casing for identifier references
+                                        "-gnatys", --    check separate subprogram specs present
+                                        "-gnatyS", --    check separate lines after THEN or ELSE
+                                        "-gnatyt", --    check token separation rules
+                                        "-gnatyx"); --    check extra parentheses around conditionals
+      for Driver ("makefile") use "";
+      for Driver ("project file") use "";
+      for Driver ("python") use "";
+      for Driver("Text") use "";
+   end Compiler;
+
+   package Binder is
+      for Default_Switches ("Ada") use ("-E");
+   end Binder;
+
+
+   package Naming is
+      for  Implementation_Exceptions ("Makefile") use ("Makefile");
+      for Body_Suffix("Text") use ".txt";
+      for Body_Suffix ("Makefile") use ".mk";
+      for Body_Suffix ("python") use ".py";
+      for Body_Suffix ("Project File") use ".gpr";
+   end Naming;
+
+end Serialcomunication;

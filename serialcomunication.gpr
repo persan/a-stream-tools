@@ -17,6 +17,7 @@ project Serialcomunication is
 
    package Ide is
       for Documentation_Dir use "doc";
+      for Vcs_Kind use "Git";
    end Ide;
 
    package Make is

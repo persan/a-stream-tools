@@ -1,7 +1,7 @@
 with Ada.Streams;
 private with Ada.Text_IO;
 private with Ada.Real_Time;
-package Serialcomunication.Timed_Input_Streams is
+package Stream_Tools.Timed_Input_Streams is
    type Timed_Input_Stream (Size : Ada.Streams.Stream_Element_Offset)
      is new Ada.Streams.Root_Stream_Type with private;
 
@@ -31,4 +31,4 @@ private
       Source : Ada.Text_IO.File_Type;
       Next_Time : Ada.Real_Time.Time;
    end record;
-end Serialcomunication.Timed_Input_Streams;
+end Stream_Tools.Timed_Input_Streams;

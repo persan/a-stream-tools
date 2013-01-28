@@ -1,9 +1,9 @@
 with "gnatcoll";
-project Serialcomunication is
+project Stream_Tools is
 
    for Languages use ("Ada", "Makefile", "Project File","Text"); -- , "Python");
 
-   for Main use ("serialcomunication-demo_main.adb");
+   for Main use ("Stream_Tools-demo_main.adb");
 
    for Source_Dirs use (".","src");
    for Object_Dir use ".obj";
@@ -11,7 +11,7 @@ project Serialcomunication is
    for Exec_Dir use "bin";
 
    package Builder is
-      for Executable ("serialcomunication-demo_main.adb") use "main";
+      for Executable ("Stream_Tools-demo_main.adb") use "main";
       for Default_Switches ("Ada") use ("-s","-j0");
    end Builder;
 
@@ -79,4 +79,4 @@ project Serialcomunication is
       for Body_Suffix ("Project File") use ".gpr";
    end Naming;
 
-end Serialcomunication;
+end Stream_Tools;

@@ -1,12 +1,12 @@
 with Ada.Text_IO;
-with Serialcomunication.Timed_Input_Streams;
-with Serialcomunication.Timed_Output_Streams;
+with Stream_Tools.Timed_Input_Streams;
+with Stream_Tools.Timed_Output_Streams;
 with GNAT.Time_Stamp;
 with GNAT.Exception_Traces;
 with GNAT.Traceback.Symbolic;
-procedure Serialcomunication.Demo_Main is
-   Src        : aliased Serialcomunication.Timed_Input_Streams.Timed_Input_Stream (100);
-   Tgt        : aliased Serialcomunication.Timed_Output_Streams.Timed_Output_Stream (100);
+procedure Stream_Tools.Demo_Main is
+   Src        : aliased Stream_Tools.Timed_Input_Streams.Timed_Input_Stream (100);
+   Tgt        : aliased Stream_Tools.Timed_Output_Streams.Timed_Output_Stream (100);
    Buffers    : constant array (1 .. 4) of access String :=
                   (new String (1 .. 2),
                    new String (1 .. 3),
@@ -31,4 +31,4 @@ begin
    String'Write (Tgt'Access, "332343"); delay 0.6;
    Tgt.Close;
 
-end Serialcomunication.Demo_Main;
+end Stream_Tools.Demo_Main;

@@ -1,7 +1,7 @@
 with Ada.Strings.Fixed;
 with GNAT.String_Split;
 
-package body Serialcomunication.Timed_Input_Streams is
+package body Stream_Tools.Timed_Input_Streams is
 
    use Ada.Text_IO;
    use Ada.Streams;
@@ -99,4 +99,4 @@ package body Serialcomunication.Timed_Input_Streams is
       Last := Item'Last;
    end Read;
 
-end Serialcomunication.Timed_Input_Streams;
+end Stream_Tools.Timed_Input_Streams;

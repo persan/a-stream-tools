@@ -5,7 +5,7 @@ with Ada.Integer_Text_IO;
 with GNAT.Sockets;
 with GNAT.Time_Stamp;
 
-package body Serialcomunication.Timed_Output_Streams is
+package body Stream_Tools.Timed_Output_Streams is
    use Ada.Directories;
    use Ada.Integer_Text_IO;
    use Ada.Float_Text_IO;
@@ -18,8 +18,8 @@ package body Serialcomunication.Timed_Output_Streams is
    ------------
 
    not overriding procedure Create
-     (Stream  : in out Timed_Output_Stream;
-      Path    : String;
+     (Stream      : in out Timed_Output_Stream;
+      Path        : String;
       Output_Base : Ada.Text_IO.Number_Base := 16;
       With_Header : Boolean := True;
       Append      : Boolean := False;
@@ -40,16 +40,30 @@ package body Serialcomunication.Timed_Output_Streams is
          Create (Stream.Target, Out_File, Path);
       end if;
       if Stream.With_Header then
-         Put_Line (Stream.Target, "-- -----------------------------------------------");
-         Put_Line (Stream.Target, "--  Sampling started : " & GNAT.Time_Stamp.Current_Time);
-         Put_Line (Stream.Target, "--    On host        : " & GNAT.Sockets.Host_Name);
-         Put_Line (Stream.Target, "--    By user        : " & Ada.Environment_Variables.Value ("USER"));
-         Put_Line (Stream.Target, "-- -----------------------------------------------");
-         New_Line (Stream.Target);
+         Stream.Put_Header;
       end if;
       Stream.Message_Time := Clock;
       Stream.Start_Time := Clock;
    end Create;
+
+   not overriding procedure Set_Output_Base
+     (Stream  : in out Timed_Output_Stream; To : Ada.Text_IO.Number_Base) is
+   begin
+      Stream.Output_Base := To;
+   end Set_Output_Base;
+   not overriding procedure Put_Line
+     (Stream  : in out Timed_Output_Stream;
+      Item    : String) is
+   begin
+      Put_Line (Stream.Target, Item);
+   end Put_Line;
+
+   not overriding procedure New_Line
+     (Stream  : in out Timed_Output_Stream;
+      Spacing : Ada.Text_IO.Positive_Count := 1) is
+   begin
+      New_Line (Stream.Target, Spacing);
+   end New_Line;
 
    -----------
    -- Close --
@@ -61,11 +75,7 @@ package body Serialcomunication.Timed_Output_Streams is
    begin
       Stream.Write;
       if Stream.With_Header then
-         New_Line (Stream.Target);
-         Put_Line (Stream.Target, "-- -----------------------------------------------");
-         Put_Line (Stream.Target, "--  Sampling Ended    : " & GNAT.Time_Stamp.Current_Time);
-         Put_Line (Stream.Target, "--  Sampling Duration :" & To_Duration (Clock - Stream.Start_Time)'Img);
-         Put_Line (Stream.Target, "-- -----------------------------------------------");
+         Stream.Put_Footer;
       end if;
       Close (Stream.Target);
    end Close;
@@ -99,5 +109,23 @@ package body Serialcomunication.Timed_Output_Streams is
       Stream.Cursor := Stream.Buffer'First;
       New_Line (Stream.Target);
    end Write;
+   not overriding procedure Put_Header
+     (Stream  : in out Timed_Output_Stream) is
+   begin
+      Stream.Put_Line ("-- -----------------------------------------------");
+      Stream.Put_Line ("--  Sampling started : " & GNAT.Time_Stamp.Current_Time);
+      Stream.Put_Line ("--    On host        : " & GNAT.Sockets.Host_Name);
+      Stream.Put_Line ("--    By user        : " & Ada.Environment_Variables.Value ("USER"));
+      Stream.Put_Line ("-- -----------------------------------------------");
+   end Put_Header;
+   not overriding procedure Put_Footer
+     (Stream  : in out Timed_Output_Stream) is
+   begin         Stream.New_Line;
+      Stream.Put_Line ("-- -----------------------------------------------");
+      Stream.Put_Line ("--  Sampling Ended    : " & GNAT.Time_Stamp.Current_Time);
+      Stream.Put_Line ("--  Sampling Duration :" & To_Duration (Clock - Stream.Start_Time)'Img);
+      Stream.Put_Line ("-- -----------------------------------------------");
 
-end Serialcomunication.Timed_Output_Streams;
+   end Put_Footer;
+
+end Stream_Tools.Timed_Output_Streams;

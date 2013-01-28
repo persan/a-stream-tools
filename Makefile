@@ -1,4 +1,4 @@
-_project=serialcomunication
+_project=Stream_Tools
 prefix=$(shell dirname $(shell dirname $(shell which gnatls)))
 bindir=${prefix}/bin
 datadir=${prefix}/share/proj

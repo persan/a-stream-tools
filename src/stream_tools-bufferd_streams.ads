@@ -38,7 +38,7 @@ private
       Read_Cursor    : Ada.Streams.Stream_Element_Offset := 1;
       Write_Cursor   : Ada.Streams.Stream_Element_Offset := 1;
       Count          : Ada.Streams.Stream_Element_Offset := 0;
-   end Buffer_Type
+   end Buffer_Type;
 
    type Bufferd_Stream (Size : Ada.Streams.Stream_Element_Offset)
      is  new Ada.Streams.Root_Stream_Type with record

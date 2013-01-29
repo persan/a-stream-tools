@@ -1,0 +1,22 @@
+with "aunit.gpr";
+with "stream_tools.gpr";
+project Stream_Tools.Test is
+
+   for Languages use ("Ada");
+
+   for Main use ("stream_tools-demo_main.adb");
+
+   for Source_Dirs use ("tests");
+   for Object_Dir use ".obj/tests";
+
+   for Exec_Dir use "bin/tests";
+
+   package Builder renames Stream_Tools.Builder;
+   package Ide renames Stream_Tools.Ide;
+   package Make renames Stream_Tools.Make;
+   package Pretty_Printer renames Stream_Tools.Pretty_Printer;
+   package Compiler renames Stream_Tools.Compiler;
+   package Binder renames Stream_Tools.Binder;
+   package Naming renames Stream_Tools.Naming;
+
+end Stream_Tools.Test;

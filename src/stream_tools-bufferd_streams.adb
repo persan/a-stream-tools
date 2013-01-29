@@ -71,6 +71,7 @@ package body Stream_Tools.Bufferd_Streams is
       when
         W_Count >= Size - Count is
       begin
+--           Ada.Text_IO.Put_Line (GNAT.Source_Info.Enclosing_Entity & "(" & Image (Item) & ")");
          H_Write (Item);
       end I_Write;
 
@@ -91,6 +92,7 @@ package body Stream_Tools.Bufferd_Streams is
             end;
          end if;
          Last := Item'Last;
+         Count := Count - Item'Length;
       end H_Read;
 
       procedure H_Write
@@ -108,6 +110,7 @@ package body Stream_Tools.Bufferd_Streams is
                  Item (Split + 1 .. Item'Last);
             end;
          end if;
+         Count := Count + Item'Length;
       end H_Write;
 
    end Buffer_Type;

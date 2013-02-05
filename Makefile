@@ -37,9 +37,11 @@ generate_tests:
 test:
 	bin/${_project}-test-main
 
-dist:
-	echo git clone . $(_project)-$(shell ./version)
-	echo rm -rf $(_project)-$(shell ./version)/.git
+dist:version
+	git clone . $(_project)-$(shell ./version)
+	rm -rf $(_project)-$(shell ./version)/.git
+	tar -czf $(_project)-$(shell ./version).tgz $(_project)-$(shell ./version)
+	rm -rf $(_project)-$(shell ./version)
 
 
 install:

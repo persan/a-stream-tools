@@ -1,3 +1,4 @@
+with GNAT.Memory_Dump;
 package body Stream_Tools.Bufferd_Streams is
 
    -----------
@@ -9,6 +10,9 @@ package body Stream_Tools.Bufferd_Streams is
       Item   : Ada.Streams.Stream_Element_Array)
    is
    begin
+      if Item'Length > Stream.Size then
+         raise Constraint_Error with "to large data" & Item'Length'Img & ">" &  Stream.Size'Img & ".";
+      end if;
       Stream.Buffer.Write (Item);
    end Write;
    overriding procedure Read
@@ -16,6 +20,9 @@ package body Stream_Tools.Bufferd_Streams is
       Item   : out Ada.Streams.Stream_Element_Array;
       Last   : out Ada.Streams.Stream_Element_Offset) is
    begin
+      if Item'Length > Stream.Size then
+         raise Constraint_Error with "to large data" & Item'Length'Img & ">" &  Stream.Size'Img & ".";
+      end if;
       Stream.Buffer.Read (Item, Last);
    end Read;
 
@@ -71,7 +78,7 @@ package body Stream_Tools.Bufferd_Streams is
       when
         W_Count >= Size - Count is
       begin
---           Ada.Text_IO.Put_Line (GNAT.Source_Info.Enclosing_Entity & "(" & Image (Item) & ")");
+         --           Ada.Text_IO.Put_Line (GNAT.Source_Info.Enclosing_Entity & "(" & Image (Item) & ")");
          H_Write (Item);
       end I_Write;
 
@@ -84,13 +91,13 @@ package body Stream_Tools.Bufferd_Streams is
          else
             declare
                Split : constant Ada.Streams.Stream_Element_Offset :=
-                         Item'First + Item'Length - (Buffer'Last - Read_Cursor);
+                         Item'First - (Buffer'Last - Read_Cursor);
             begin
-               Buffer (Read_Cursor .. Buffer'Last) := Item (Item'First .. Split);
-               Buffer (Buffer'First .. Item'Last - Split) :=
-                 Item (Split + 1 .. Item'Last);
+               Item (Item'First .. Split) := Buffer (Read_Cursor .. Buffer'Last);
+               Item (Split + 1 .. Item'Last) := Buffer (Buffer'First .. Item'Last - Split);
             end;
          end if;
+         Read_Cursor := Buffer'First + (Read_Cursor mod Buffer'Length);
          Last := Item'Last;
          Count := Count - Item'Length;
       end H_Read;
@@ -103,16 +110,42 @@ package body Stream_Tools.Bufferd_Streams is
          else
             declare
                Split : constant Ada.Streams.Stream_Element_Offset :=
-                         Item'First + Item'Length - (Buffer'Last - Write_Cursor);
+                         Item'First  - (Buffer'Last - Write_Cursor);
             begin
                Buffer (Write_Cursor .. Buffer'Last) := Item (Item'First .. Split);
                Buffer (Buffer'First .. Item'Last - Split) :=
                  Item (Split + 1 .. Item'Last);
             end;
          end if;
+         Write_Cursor := Buffer'First + (Write_Cursor mod Buffer'Length);
          Count := Count + Item'Length;
       end H_Write;
 
+      procedure Dump is
+      begin
+         if Read_Cursor + Count <= Buffer'Last then
+            GNAT.Memory_Dump.Dump (Addr => Buffer (Read_Cursor)'Address, Count => Integer (Count));
+         else
+            GNAT.Memory_Dump.Dump (Addr => Buffer (Read_Cursor)'Address, Count => Integer (Buffer'Last - Read_Cursor));
+            GNAT.Memory_Dump.Dump (Addr => Buffer (Buffer'First)'Address, Count => Integer (Count - (Buffer'Last - Read_Cursor)));
+         end if;
+
+      end Dump;
+      function GetCount return Ada.Streams.Stream_Element_Offset is
+      begin
+         return Count;
+      end GetCount;
+
    end Buffer_Type;
+   not overriding procedure Dump
+     (Stream : in out Bufferd_Stream) is
+   begin
+      Stream.Buffer.Dump;
+   end Dump;
+   function GetCount
+     (Stream : in out Bufferd_Stream) return Ada.Streams.Stream_Element_Offset is
+   begin
+      return Stream.Buffer.GetCount;
+   end GetCount;
 
 end Stream_Tools.Bufferd_Streams;

@@ -1,5 +1,7 @@
 with Ada.Streams;
 package Stream_Tools.Bufferd_Streams is
+--  This package provides a FIFO Buffer with a stream interface.
+
    type Bufferd_Stream (Size : Ada.Streams.Stream_Element_Offset)
      is new Ada.Streams.Root_Stream_Type with private;
 
@@ -7,10 +9,25 @@ package Stream_Tools.Bufferd_Streams is
      (Stream : in out Bufferd_Stream;
       Item   : out Ada.Streams.Stream_Element_Array;
       Last   : out Ada.Streams.Stream_Element_Offset);
+   --  Read the full Stream_Element_Array, if the buffer does not contain enogh
+   --  Elements then wait until enogh is avalible
+   --  Will raise constraint error if the buffer is to small to contain the
+   --  total amount of elements.
 
    overriding procedure Write
      (Stream : in out Bufferd_Stream;
       Item   : Ada.Streams.Stream_Element_Array);
+   --  Writes teh ewlement array to the buffer
+   --  If ther isent enigh space then waut uintil there is place.
+   --  Will raise constraint error if the buffer is to small to contain the
+   --  total amount of elements.
+
+   not overriding function GetCount
+     (Stream : in out Bufferd_Stream) return Ada.Streams.Stream_Element_Offset;
+   --  Returns the number of Stream_Elements in the buffer
+
+   not overriding procedure Dump
+     (Stream : in out Bufferd_Stream);
 
 private
    use type Ada.Streams.Stream_Element_Count;
@@ -21,6 +38,9 @@ private
          Last   : out Ada.Streams.Stream_Element_Offset);
       entry Write
         (Item   : Ada.Streams.Stream_Element_Array);
+      procedure Dump;
+      function GetCount return Ada.Streams.Stream_Element_Offset;
+
    private
       procedure H_Read
         (Item   : out Ada.Streams.Stream_Element_Array;

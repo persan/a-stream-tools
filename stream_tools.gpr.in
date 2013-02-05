@@ -1,0 +1,13 @@
+project Stream_Tools is
+   Version := "1.0.0";
+
+   type Library_Type_Kind is ("static","relocatable");
+
+   Library_Type : Library_Type_Kind  := external ("LIBRARY_TYPE");
+
+   for Source_Dirs use ("../../include/stream_tools");
+   for Library_Dir use "../stream_tools" & Library_Type;
+   for Library_Name use "stream_tools";
+   for Library_Kind use Library_Type;
+   for Externally_Built use "True";
+end Stream_Tools;

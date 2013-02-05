@@ -1,0 +1,13 @@
+with "stream_tools.gpr";
+project version is
+   for Object_Dir use ".obj/version";
+   for Exec_Dir use ".";
+   for Source_Dirs use ("tools");
+   for Main use ("version.adb");
+   package Compiler is
+      for default_Switches("Ada") use
+        stream_tools.Compiler'default_Switches("Ada") &
+      ("-gnatwA",
+       "-gnateDVERSION=""" &stream_tools.Version & """");
+   end Compiler;
+end Version;

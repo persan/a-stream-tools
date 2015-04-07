@@ -184,6 +184,28 @@ package body Stream_Tools.Memory_Streams is
       Read (This, Memory_Stream (Item));
    end Read;
 
+   function Input
+     (This : not null access Ada.Streams.Root_Stream_Type'Class)
+      return Dynamic_Memory_Stream is
+      Initial_Size : Ada.Streams.Stream_Element_Offset;
+      Strategy     : Expand_Strategy;
+   begin
+      Ada.Streams.Stream_Element_Offset'Read (This, Initial_Size);
+      Expand_Strategy'Read (This, Strategy);
+      return Ret : Dynamic_Memory_Stream (Initial_Size, Strategy) do
+         Ada.Streams.Stream_Element_Array'Write (This, Ret.Buffer.As_Pointer.all (0 .. Initial_Size - 1));
+      end return;
+   end Input;
+
+   procedure Output
+     (This : not null access Ada.Streams.Root_Stream_Type'Class;
+      Item   : Dynamic_Memory_Stream) is
+   begin
+      Ada.Streams.Stream_Element_Offset'Write (This, Item.Cursor - 1);
+      Expand_Strategy'Write (This, Item.Strategy);
+      Ada.Streams.Stream_Element_Array'Write (This, Item.Buffer.As_Pointer.all (0 .. Item.Cursor - 1));
+   end Output;
+
    overriding procedure Write
      (This   : not null access Ada.Streams.Root_Stream_Type'Class;
       Item   : Dynamic_Memory_Stream) is

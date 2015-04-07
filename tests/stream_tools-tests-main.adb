@@ -30,9 +30,10 @@ with Stream_Tools.Stream_Element_Array_Image;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Streams; use Ada.Streams;
 with Ada.Assertions; use Ada.Assertions;
+with System; use System;
 
 procedure Stream_Tools.Tests.Main is
-   B : aliased Stream_Tools.Bufferd_Streams.Bufferd_Stream (6);
+   B : aliased Stream_Tools.Bufferd_Streams.Bufferd_Stream (6, System.Default_Priority);
    I : Ada.Streams.Stream_Element_Array (1 .. 4) := (others => 0);
 
 begin
@@ -46,19 +47,15 @@ begin
    Short_Short_Integer'Write (B'Access, 6);
 
    I := (others => 0);
-   Put_Line ("1>" & B.Image);
    Ada.Streams.Stream_Element_Array'Read (B'Access, I);
    Put_Line ("          :" & Stream_Element_Array_Image (I));
 --     Assert (I = (1, 2, 3, 4), "");
    Put_Line ("---------------------");
-   Put_Line (" <" & B.Image);
    Short_Short_Integer'Write (B'Access, 7);
    Short_Short_Integer'Write (B'Access, 8);
-   Put_Line ("2>" & B.Image);
 
    I := (others => 0);
    Ada.Streams.Stream_Element_Array'Read (B'Access, I);
-   Put_Line ("3<" & B.Image);
    Put_Line ("          :" & Stream_Element_Array_Image (I));
 --     Assert (I = (5, 6, 7, 8), "");
    Put_Line ("---------------------");
@@ -67,10 +64,8 @@ begin
    Short_Short_Integer'Write (B'Access, 2);
    Short_Short_Integer'Write (B'Access, 3);
    Short_Short_Integer'Write (B'Access, 4);
-   Put_Line ("5>" & B.Image);
    I := (others => 0);
    Ada.Streams.Stream_Element_Array'Read (B'Access, I);
-   Put_Line ("6<" & B.Image);
    Put_Line ("          :" & Stream_Element_Array_Image (I));
 --     Assert (I = (1, 2, 3, 4), "");
 
@@ -78,10 +73,8 @@ begin
    Short_Short_Integer'Write (B'Access, 2);
    Short_Short_Integer'Write (B'Access, 3);
    Short_Short_Integer'Write (B'Access, 4);
-   Put_Line ("5>" & B.Image);
    I := (others => 0);
    Ada.Streams.Stream_Element_Array'Read (B'Access, I);
-   Put_Line ("6<" & B.Image);
    Put_Line ("          :" & Stream_Element_Array_Image (I));
    Assert (I = (1, 2, 3, 4), "");
    I := (1, 2, 3, 4);

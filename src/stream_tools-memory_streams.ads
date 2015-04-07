@@ -169,6 +169,13 @@ package Stream_Tools.Memory_Streams is
    overriding procedure Write
      (This : in out Dynamic_Memory_Stream;
       Item   : Ada.Streams.Stream_Element_Array);
+   function Input
+     (This : not null access Ada.Streams.Root_Stream_Type'Class)
+      return Dynamic_Memory_Stream;
+
+   procedure Output
+     (This : not null access Ada.Streams.Root_Stream_Type'Class;
+      Item   : Dynamic_Memory_Stream);
 
 private
    subtype large_buffer is
@@ -192,17 +199,17 @@ private
       Buffer        : Large_Buffer_Union;
       Buffer_Length : Streams.Stream_Element_Count  := 0;
       Cursor        : Streams.Stream_Element_Offset := 0;
-   end record;
+   end record with
+     Read => Read,
+     Write => Write;
 
    procedure Read
      (This : not null access Ada.Streams.Root_Stream_Type'Class;
       Item   : out Memory_Stream);
-   for Memory_Stream'Read use Read;
 
    procedure Write
      (This : not null access Ada.Streams.Root_Stream_Type'Class;
       Item   : Memory_Stream);
-   for Memory_Stream'Write use Write;
 
    type controler (controled : not null access Dynamic_Memory_Stream)
      is new Ada.Finalization.Limited_Controlled with null record;
@@ -214,7 +221,11 @@ private
      (Initial_Size : Streams.Stream_Element_Offset;
       Strategy     : Expand_Strategy) is new Memory_Stream with record
       C : controler (Dynamic_Memory_Stream'Access);
-   end record;
+   end record with
+     Read => Read,
+     Write => Write,
+     Output => Output,
+     Input => Input;
 
    procedure Initialize (This : in out Dynamic_Memory_Stream);
    procedure Finalize   (This : in out Dynamic_Memory_Stream);
@@ -222,12 +233,11 @@ private
    overriding procedure Read
      (This : not null access Ada.Streams.Root_Stream_Type'Class;
       Item   : out Dynamic_Memory_Stream);
-   for Dynamic_Memory_Stream'Read use Read;
 
    overriding procedure Write
      (This : not null access Ada.Streams.Root_Stream_Type'Class;
       Item   : Dynamic_Memory_Stream);
-   for Dynamic_Memory_Stream'Write use Write;
+
    procedure Expand
      (This : in out Dynamic_Memory_Stream;
       to_Size : Ada.Streams.Stream_Element_Offset);

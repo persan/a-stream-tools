@@ -22,22 +22,21 @@
 --  ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR    --
 --  OTHER DEALINGS IN THE SOFTWARE.                                          --
 -------------------------------------------------------------------------------
-
+with GNAT.Bounded_Buffers;
 with Ada.Streams;
+with System;
 package Stream_Tools.Bufferd_Streams is
 
-   --  This package provides a syncronized FIFO Buffer with a stream interface.
-   --  Note that the maximim buffer size is 64K (16#FFFF#).
-   use type Ada.Streams.Stream_Element_Count;
+   --  This package provides a task-safe FIFO Buffer with a stream interface.
 
-   type Bufferd_Stream (Size : Ada.Streams.Stream_Element_Offset) is
+   type Bufferd_Stream (Capacity : Positive;
+                        Ceiling : System.Priority) is
      new Ada.Streams.Root_Stream_Type with private;
 
    overriding procedure Read
      (Stream : in out Bufferd_Stream;
       Item   : out Ada.Streams.Stream_Element_Array;
-      Last   : out Ada.Streams.Stream_Element_Offset) with
-     Pre => Item'Length <= Stream.Size;
+      Last   : out Ada.Streams.Stream_Element_Offset);
    --  Read the full Stream_Element_Array, if the buffer does not contain enogh
    --  Elements then wait until enogh space is avalible
    --  Will raise constraint error if the buffer is to small to contain the
@@ -45,54 +44,17 @@ package Stream_Tools.Bufferd_Streams is
 
    overriding procedure Write
      (Stream : in out Bufferd_Stream;
-      Item   : Ada.Streams.Stream_Element_Array) with
-     Pre => Item'Length <= Stream.Size;
+      Item   : Ada.Streams.Stream_Element_Array);
    --  Writes the element array to the buffer
-   --  If ther is'nt enogh space then wait uintil there is place.
+   --  If ther is'nt enogh space then wait until there is place.
    --  Will raise constraint error if the buffer is to small to contain the
    --  total amount of elements.
 
-   not overriding function GetCount
-     (Stream : in out Bufferd_Stream) return Ada.Streams.Stream_Element_Offset;
-   --  Returns the number of Stream_Elements in the buffer
-
-   not overriding function Image
-     (Stream : in out Bufferd_Stream) return String;
-   --  Returns a printable string representing the buffer.
-
 private
-   subtype My_Stream_Element_Count is Ada.Streams.Stream_Element_Count range 1 .. 2 ** 16;
-   protected type Buffer_Type (Size : Ada.Streams.Stream_Element_Offset) is
-      entry Read
-        (Item   : out Ada.Streams.Stream_Element_Array;
-         Last   : out Ada.Streams.Stream_Element_Offset);
-      entry Write
-        (Item   : Ada.Streams.Stream_Element_Array);
-
-      function GetCount return Ada.Streams.Stream_Element_Offset;
-      function Image return String;
-
-   private
-      procedure H_Read
-        (Item   : out Ada.Streams.Stream_Element_Array;
-         Last   : out Ada.Streams.Stream_Element_Offset);
-      procedure H_Write
-        (Item   : Ada.Streams.Stream_Element_Array);
-
-      entry I_Read (My_Stream_Element_Count)
-        (Item   : out Ada.Streams.Stream_Element_Array;
-         Last   : out Ada.Streams.Stream_Element_Offset);
-      entry I_Write (My_Stream_Element_Count)
-        (Item   : Ada.Streams.Stream_Element_Array);
-
-      Buffer         : Ada.Streams.Stream_Element_Array (1 .. Size);
-      Read_Cursor    : Ada.Streams.Stream_Element_Offset := 1;
-      Write_Cursor   : Ada.Streams.Stream_Element_Offset := 1;
-      Count          : Ada.Streams.Stream_Element_Offset := 0;
-   end Buffer_Type;
-
-   type Bufferd_Stream (Size : Ada.Streams.Stream_Element_Offset)
+   package Stream_Element_Buffers is new GNAT.Bounded_Buffers (Ada.Streams.Stream_Element);
+   type Bufferd_Stream (Capacity : Positive;
+                        Ceiling : System.Priority)
      is  new Ada.Streams.Root_Stream_Type with record
-      Buffer : Buffer_Type (Size);
+      Buffer : Stream_Element_Buffers.Bounded_Buffer (Capacity, Ceiling);
    end record;
 end Stream_Tools.Bufferd_Streams;

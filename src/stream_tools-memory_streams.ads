@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 --                                                                           --
---  Copyright 2007 Per Sandberg <per.sandberg@bredband.net>                  --
+--  Copyright 2015 Per Sandberg <per.s.sandberg@bahnhof.se>                  --
 --                                                                           --
 --  Permission is hereby granted, free of charge, to any person obtaining a  --
 --  copy of this software and associated documentation files                 --

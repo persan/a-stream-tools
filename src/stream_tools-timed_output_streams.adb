@@ -1,3 +1,28 @@
+-------------------------------------------------------------------------------
+--                                                                           --
+--  Copyright 2015 Per Sandberg <per.s.sandberg@bahnhof.se>                  --
+--                                                                           --
+--  Permission is hereby granted, free of charge, to any person obtaining a  --
+--  copy of this software and associated documentation files                 --
+--  (the "Software"), to deal in the Software without restriction, including --
+--  without limitation the rights to use, copy, modify, merge, publish,      --
+--  distribute, sublicense, and / or sell copies of the Software, and to     --
+--  permit persons to whom the Software is furnished to do so, subject to    --
+--  the following conditions :                                               --
+--                                                                           --
+--  The above copyright notice and this permission notice shall be included  --
+--  in all copies or substantial portions of the Software.                   --
+--                                                                           --
+--  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  --
+--  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF               --
+--  MERCHANTABILITY,                                                         --
+--  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  --
+--  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR     --
+--  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,    --
+--  ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR    --
+--  OTHER DEALINGS IN THE SOFTWARE.                                          --
+-------------------------------------------------------------------------------
+
 with Ada.Directories;
 with Ada.Environment_Variables;
 with Ada.Float_Text_IO;
@@ -89,14 +114,29 @@ package body Stream_Tools.Timed_Output_Streams is
       Item   : Ada.Streams.Stream_Element_Array)
    is
    begin
-      if Stream.Cursor > Stream.Buffer'First and then
-        (Clock - Stream.Message_Time) > Stream.Spacing  then
-         Stream.Write;
-         Stream.Message_Time := Clock;
+      if (Stream.Cursor > Stream.Buffer'First and then
+            (Clock - Stream.Message_Time) > Stream.Spacing) or
+        (Stream.Cursor + Item'Length > Stream.Buffer'Last)
+      then
+         Stream.Flush;
       end if;
       Stream.Buffer (Stream.Cursor .. Stream.Cursor + Item'Length - 1) := Item;
       Stream.Cursor := Stream.Cursor + Item'Length;
    end Write;
+
+   not overriding procedure Flush
+     (Stream : in out Timed_Output_Stream) is
+   begin
+      Stream.Write;
+      Stream.Tick;
+   end Flush;
+
+   not overriding procedure Tick
+     (Stream : in out Timed_Output_Stream) is
+   begin
+      Stream.Message_Time := Clock;
+   end Tick;
+
    not overriding procedure Write
      (Stream : in out Timed_Output_Stream) is
    begin
@@ -109,6 +149,7 @@ package body Stream_Tools.Timed_Output_Streams is
       Stream.Cursor := Stream.Buffer'First;
       New_Line (Stream.Target);
    end Write;
+
    not overriding procedure Put_Header
      (Stream  : in out Timed_Output_Stream) is
    begin

@@ -9,9 +9,9 @@ project Stream_Tools.Test is
                  "stream_tools-demo_main.adb");
 
    for Source_Dirs use ("tests");
-   for Object_Dir use ".obj/tests";
+   for Object_Dir use ".obj/" & project'Name;
 
-   for Exec_Dir use "bin/tests";
+   for Exec_Dir use "bin";
 
    package Builder renames Stream_Tools.Builder;
    package Ide renames Stream_Tools.Ide;

@@ -27,6 +27,7 @@ with Ada.Streams;
 with Ada.Real_Time;
 with Ada.Text_IO;
 with Ada.Containers.Vectors;
+with Ada.Finalization;
 package Stream_Tools.Timed_Streams is
 
    type Timed_Stream is abstract new Ada.Streams.Root_Stream_Type with private;
@@ -38,7 +39,9 @@ package Stream_Tools.Timed_Streams is
 
    not overriding procedure Open
      (Stream      : in out Timed_Stream;
-      Path        : String);
+      Path        : String;             --  Path to input file
+      Ignore_EOF  : Boolean := False    --  Every read past input data will return 0
+      );
 
    not overriding procedure Put_Line
      (Stream  : in out Timed_Stream;
@@ -65,11 +68,21 @@ package Stream_Tools.Timed_Streams is
    not overriding procedure Put_Footer
      (Stream  : in out Timed_Stream);
 
+   overriding procedure Read
+     (Stream : in out Timed_Stream;
+      Item   : out Ada.Streams.Stream_Element_Array;
+      Last   : out Ada.Streams.Stream_Element_Offset) is abstract;
+
+   overriding procedure Write
+     (Stream : in out Timed_Stream;
+      Item   : Ada.Streams.Stream_Element_Array) is abstract;
+
 private
    type Simple_Event is record
       Time : Ada.Real_Time.Time_Span;
       Data : Ada.Streams.Stream_Element;
    end record;
+   type Controler_Type (Controled : not null access Timed_Stream) is new Ada.Finalization.Limited_Controlled with null record;
    package Event_Vectors is new Ada.Containers.Vectors (Positive, Simple_Event);
    type Timed_Stream is abstract new Ada.Streams.Root_Stream_Type with record
       Buffer       : Event_Vectors.Vector;
@@ -78,7 +91,11 @@ private
       Target       : Ada.Text_IO.File_Type;
       With_Header  : Boolean := False;
       Mode         : Ada.Text_IO.File_Mode;
+      Controler    : Controler_Type (Timed_Stream'Access);
+      Null_EOF     : Boolean := False;
    end record;
+   overriding procedure Initialize (Object : in out Controler_Type);
+   overriding procedure Finalize   (Object : in out Controler_Type);
 
    not overriding procedure Write
      (Stream : in out Timed_Stream);

@@ -41,20 +41,27 @@ begin
    Integer'Write (O'Access, 2);
    delay 0.2;
    Integer'Write (O'Access, 3);
+   delay 0.2;
+   Integer'Write (O'Access, 4);
+   delay 0.2;
+   Integer'Write (O'Access, 16#11223344#);
    O.Close;
    declare
       I : aliased Stream_Tools.Timed_Streams.Input.Timed_Input_Stream;
       Now : constant Ada.Real_Time.Time := Ada.Real_Time.Clock;
       Data : Integer := 0;
+      D0   : Short_Short_Integer;
    begin
       I.Open ("test");
-      Put_Line (To_Duration (Clock - Now)'Img & " : " & Data'Img);
-      Integer'Read (I'Access, Data);
-      Put_Line (To_Duration (Clock - Now)'Img & " : " & Data'Img);
-      Integer'Read (I'Access, Data);
-      Put_Line (To_Duration (Clock - Now)'Img & " : " & Data'Img);
-      Integer'Read (I'Access, Data);
-      Put_Line (To_Duration (Clock - Now)'Img & " : " & Data'Img);
+      for J in 1 .. 4 loop
+         Put_Line (To_Duration (Clock - Now)'Img & " : " & Data'Img);
+         Integer'Read (I'Access, Data);
+      end loop;
+      for j in 1 .. 8 loop
+         Short_Short_Integer'Read (I'Access, D0);
+         Put_Line (To_Duration (Clock - Now)'Img & " : " & D0'Img);
+      end loop;
+
       I.Close;
    end;
 

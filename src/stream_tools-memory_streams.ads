@@ -98,9 +98,11 @@ package Stream_Tools.Memory_Streams is
    --  Dumps the contents of the buffer from the first element
    --  to the cursor.
 
-   type Memory_Stream is limited new Ada.Streams.Root_Stream_Type
+   type Memory_Stream is new Ada.Streams.Root_Stream_Type
      and Memory_Stream_Interface
-   with private;
+   with private with
+     Read => Read,
+     Write => Write;
 
    type Any_Memory_Stream is access all Memory_Stream'Class;
 
@@ -158,6 +160,13 @@ package Stream_Tools.Memory_Streams is
    overriding procedure Write
      (This : in out Memory_Stream;
       Item   : Ada.Streams.Stream_Element_Array);
+   procedure Read
+     (This : not null access Ada.Streams.Root_Stream_Type'Class;
+      Item : out Memory_Stream);
+
+   procedure Write
+     (This : not null access Ada.Streams.Root_Stream_Type'Class;
+      Item : Memory_Stream);
 
    type Expand_Strategy is (As_Needed,
                             Multiply_By_Two,
@@ -177,6 +186,14 @@ package Stream_Tools.Memory_Streams is
      (This : not null access Ada.Streams.Root_Stream_Type'Class;
       Item   : Dynamic_Memory_Stream);
 
+   overriding procedure Read
+     (This : not null access Ada.Streams.Root_Stream_Type'Class;
+      Item   : out Dynamic_Memory_Stream);
+
+   overriding procedure Write
+     (This : not null access Ada.Streams.Root_Stream_Type'Class;
+      Item   : Dynamic_Memory_Stream);
+
 private
    subtype large_buffer is
      Streams.Stream_Element_Array (0 .. Streams.Stream_Element_Offset'Last);
@@ -193,23 +210,13 @@ private
    end record;
    pragma Unchecked_Union (Large_Buffer_Union);
 
-   type Memory_Stream is limited new Streams.Root_Stream_Type
+   type Memory_Stream is new Streams.Root_Stream_Type
      and Memory_Stream_Interface
    with record
       Buffer        : Large_Buffer_Union;
       Buffer_Length : Streams.Stream_Element_Count  := 0;
       Cursor        : Streams.Stream_Element_Offset := 0;
-   end record with
-     Read => Read,
-     Write => Write;
-
-   procedure Read
-     (This : not null access Ada.Streams.Root_Stream_Type'Class;
-      Item   : out Memory_Stream);
-
-   procedure Write
-     (This : not null access Ada.Streams.Root_Stream_Type'Class;
-      Item   : Memory_Stream);
+   end record;
 
    type controler (controled : not null access Dynamic_Memory_Stream)
      is new Ada.Finalization.Limited_Controlled with null record;
@@ -229,14 +236,6 @@ private
 
    procedure Initialize (This : in out Dynamic_Memory_Stream);
    procedure Finalize   (This : in out Dynamic_Memory_Stream);
-
-   overriding procedure Read
-     (This : not null access Ada.Streams.Root_Stream_Type'Class;
-      Item   : out Dynamic_Memory_Stream);
-
-   overriding procedure Write
-     (This : not null access Ada.Streams.Root_Stream_Type'Class;
-      Item   : Dynamic_Memory_Stream);
 
    procedure Expand
      (This : in out Dynamic_Memory_Stream;

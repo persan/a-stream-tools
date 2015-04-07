@@ -40,7 +40,8 @@ package Stream_Tools.Timed_Streams.Output is
 
    overriding procedure Open
      (Stream      : in out Timed_Output_Stream;
-      Path        : String) with
+      Path        : String;
+      Ignore_EOF  : Boolean := False) with
      No_Return => True;
 
 private

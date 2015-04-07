@@ -55,10 +55,11 @@ package body Stream_Tools.Timed_Streams is
 
    not overriding procedure Open
      (Stream      : in out Timed_Stream;
-      Path        : String)
+      Path        : String;
+      Ignore_EOF  : Boolean := False)
    is
       use GNAT.Regpat;
-      M : constant GNAT.Regpat.Pattern_Matcher := GNAT.Regpat.Compile ("([\d.]+);([\d\n]+)");
+      M       : constant GNAT.Regpat.Pattern_Matcher := GNAT.Regpat.Compile ("([\d.]+);([\d\n]+)");
       procedure Read (Line : String);
       procedure Read (Line : String) is
          Matches : GNAT.Regpat.Match_Array (0 .. GNAT.Regpat.Paren_Count (M));
@@ -75,10 +76,11 @@ package body Stream_Tools.Timed_Streams is
       while not Ada.Text_IO.End_Of_File (Stream.Target) loop
          Read (Get_Line (Stream.Target));
       end loop;
+      Close (Stream.Target);
       Stream.C := Stream.Buffer.To_Cursor (1);
       Stream.Start_Time := Ada.Real_Time.Time_First;
-      Close (Stream.Target);
       Stream.Mode := In_File;
+      Stream.Null_EOF := Ignore_EOF;
    end Open;
 
    not overriding procedure Put_Line
@@ -105,7 +107,7 @@ package body Stream_Tools.Timed_Streams is
      (Stream  : in out Timed_Stream)
    is
    begin
-      if Stream.Mode = Out_File then
+      if Stream.Mode = Out_File  and then Is_Open (Stream.Target) then
          Stream.Write;
          if Stream.With_Header then
             Stream.Put_Footer;
@@ -135,8 +137,10 @@ package body Stream_Tools.Timed_Streams is
          delay until Stream.Start_Time + Stream.Buffer (Stream.C).Time;
          Item := Stream.Buffer (Stream.C).Data;
          Stream.C := Next (Stream.C);
+      elsif Stream.Null_EOF then
+         Item := 0;
       else
-         raise Constraint_Error with "Buffer over run";
+         raise Constraint_Error with "Tried to read past last data in buffer";
       end if;
    end Read;
 
@@ -169,5 +173,15 @@ package body Stream_Tools.Timed_Streams is
       Stream.Put_Line ("-- -----------------------------------------------");
 
    end Put_Footer;
+
+   overriding procedure Initialize (Object : in out Controler_Type) is
+   begin
+      null;
+   end Initialize;
+
+   overriding procedure Finalize   (Object : in out Controler_Type) is
+   begin
+      Object.Controled.Close;
+   end Finalize;
 
 end Stream_Tools.Timed_Streams;

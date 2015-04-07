@@ -45,7 +45,8 @@ package body Stream_Tools.Timed_Streams.Output is
 
    overriding procedure Open
      (Stream      : in out Timed_Output_Stream;
-      Path        : String)
+      Path        : String;
+      Ignore_EOF  : Boolean := False)
    is
    begin
       raise Program_Error with "Open on Output_Streams not allowed";

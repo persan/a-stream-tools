@@ -45,7 +45,6 @@ project Stream_Tools is
          for Library_Interface use
            ("stream_tools",
             "stream_tools.bufferd_streams",
-            "stream_tools.stream_element_array_image",
             "stream_tools.timed_input_streams",
             "stream_tools.timed_output_streams");
 

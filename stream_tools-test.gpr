@@ -5,7 +5,8 @@ project Stream_Tools.Test is
 
    for Languages use ("Ada");
 
-   for Main use ("stream_tools-tests-main.adb",
+   for Main use ("stream_tools-tests-test_timed_streams.adb",
+                 "stream_tools-tests-main.adb",
                  "stream_tools-demo_main.adb");
 
    for Source_Dirs use ("tests");

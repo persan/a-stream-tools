@@ -23,70 +23,77 @@
 --  OTHER DEALINGS IN THE SOFTWARE.                                          --
 -------------------------------------------------------------------------------
 
-with Ada.Directories;
 with Ada.Environment_Variables;
-with Ada.Float_Text_IO;
-with Ada.Integer_Text_IO;
 with GNAT.Sockets;
 with GNAT.Time_Stamp;
-
-package body Stream_Tools.Timed_Output_Streams is
-   use Ada.Directories;
-   use Ada.Integer_Text_IO;
-   use Ada.Float_Text_IO;
+with GNAT.Formatted_String;
+with GNAT.Regpat;
+package body Stream_Tools.Timed_Streams is
    use Ada.Real_Time;
    use Ada.Streams;
    use Ada.Text_IO;
-
+   use Event_Vectors;
    ------------
    -- Create --
    ------------
 
    not overriding procedure Create
-     (Stream      : in out Timed_Output_Stream;
+     (Stream      : in out Timed_Stream;
       Path        : String;
-      Output_Base : Ada.Text_IO.Number_Base := 16;
-      With_Header : Boolean := True;
-      Append      : Boolean := False;
-      Spacing     : Ada.Real_Time.Time_Span := Ada.Real_Time.To_Time_Span (0.1))
+      With_Header : Boolean := True)
    is
    begin
-      Stream.Cursor := Stream.Buffer'First;
-      Stream.Spacing := Spacing;
-      Stream.Output_Base := Output_Base;
       Stream.With_Header := With_Header;
-      if Append then
-         if Exists (Path) then
-            Open (Stream.Target, Append_File, Path);
-         else
-            Create (Stream.Target, Out_File, Path);
-         end if;
-      else
-         Create (Stream.Target, Out_File, Path);
-      end if;
+      Stream.Start_Time := Ada.Real_Time.Clock;
+      Create (Stream.Target, Out_File, Path);
       if Stream.With_Header then
          Stream.Put_Header;
       end if;
-      Stream.Message_Time := Clock;
       Stream.Start_Time := Clock;
+      Stream.Mode := Out_File;
    end Create;
 
-   not overriding procedure Set_Output_Base
-     (Stream  : in out Timed_Output_Stream; To : Ada.Text_IO.Number_Base) is
+   not overriding procedure Open
+     (Stream      : in out Timed_Stream;
+      Path        : String)
+   is
+      use GNAT.Regpat;
+      M : constant GNAT.Regpat.Pattern_Matcher := GNAT.Regpat.Compile ("([\d.]+);([\d\n]+)");
+      procedure Read (Line : String);
+      procedure Read (Line : String) is
+         Matches : GNAT.Regpat.Match_Array (0 .. GNAT.Regpat.Paren_Count (M));
+      begin
+         GNAT.Regpat.Match (M, Line, Matches);
+         if Matches (Matches'First) /= No_Match then
+            Stream.Buffer.Append ((To_Time_Span (Duration'Value (Line (Matches (1).First .. Matches (1).Last))),
+                                  Stream_Element'Value (Line (Matches (2).First .. Matches (2).Last))));
+         end if;
+      end Read;
    begin
-      Stream.Output_Base := To;
-   end Set_Output_Base;
+      Stream.Buffer.Clear;
+      Open (Stream.Target, In_File, Path);
+      while not Ada.Text_IO.End_Of_File (Stream.Target) loop
+         Read (Get_Line (Stream.Target));
+      end loop;
+      Stream.C := Stream.Buffer.To_Cursor (1);
+      Stream.Start_Time := Ada.Real_Time.Time_First;
+      Close (Stream.Target);
+      Stream.Mode := In_File;
+   end Open;
+
    not overriding procedure Put_Line
-     (Stream  : in out Timed_Output_Stream;
+     (Stream  : in out Timed_Stream;
       Item    : String) is
    begin
+      Stream.Write;
       Put_Line (Stream.Target, Item);
    end Put_Line;
 
    not overriding procedure New_Line
-     (Stream  : in out Timed_Output_Stream;
+     (Stream  : in out Timed_Stream;
       Spacing : Ada.Text_IO.Positive_Count := 1) is
    begin
+      Stream.Write;
       New_Line (Stream.Target, Spacing);
    end New_Line;
 
@@ -95,63 +102,56 @@ package body Stream_Tools.Timed_Output_Streams is
    -----------
 
    not overriding procedure Close
-     (Stream  : in out Timed_Output_Stream)
+     (Stream  : in out Timed_Stream)
    is
    begin
-      Stream.Write;
-      if Stream.With_Header then
-         Stream.Put_Footer;
+      if Stream.Mode = Out_File then
+         Stream.Write;
+         if Stream.With_Header then
+            Stream.Put_Footer;
+         end if;
+         Close (Stream.Target);
       end if;
-      Close (Stream.Target);
    end Close;
 
    -----------
    -- Write --
    -----------
-
-   overriding procedure Write
-     (Stream : in out Timed_Output_Stream;
-      Item   : Ada.Streams.Stream_Element_Array)
-   is
+   not overriding procedure Write
+     (Stream : in out Timed_Stream;
+      Item   : Ada.Streams.Stream_Element) is
    begin
-      if (Stream.Cursor > Stream.Buffer'First and then
-            (Clock - Stream.Message_Time) > Stream.Spacing) or
-        (Stream.Cursor + Item'Length > Stream.Buffer'Last)
-      then
-         Stream.Flush;
-      end if;
-      Stream.Buffer (Stream.Cursor .. Stream.Cursor + Item'Length - 1) := Item;
-      Stream.Cursor := Stream.Cursor + Item'Length;
+      Stream.Buffer.Append ((Ada.Real_Time.Clock - Stream.Start_Time, Item));
    end Write;
 
-   not overriding procedure Flush
-     (Stream : in out Timed_Output_Stream) is
+   not overriding procedure Read
+     (Stream : in out Timed_Stream;
+      Item   : out Ada.Streams.Stream_Element) is
    begin
-      Stream.Write;
-      Stream.Tick;
-   end Flush;
-
-   not overriding procedure Tick
-     (Stream : in out Timed_Output_Stream) is
-   begin
-      Stream.Message_Time := Clock;
-   end Tick;
+      if Stream.Start_Time = Ada.Real_Time.Time_First then
+         Stream.Start_Time := Ada.Real_Time.Clock;
+      end if;
+      if Has_Element (Stream.C) then
+         delay until Stream.Start_Time + Stream.Buffer (Stream.C).Time;
+         Item := Stream.Buffer (Stream.C).Data;
+         Stream.C := Next (Stream.C);
+      else
+         raise Constraint_Error with "Buffer over run";
+      end if;
+   end Read;
 
    not overriding procedure Write
-     (Stream : in out Timed_Output_Stream) is
+     (Stream : in out Timed_Stream) is
+      use GNAT.Formatted_String;
    begin
-      Put (Stream.Target, Float (To_Duration (Clock - Stream.Message_Time)), Fore => 1, Aft => 3, Exp => 0);
-      Put (Stream.Target, "; ");
-      for I of Stream.Buffer (Stream.Buffer'First .. Stream.Cursor - 1) loop
-         Put (Stream.Target, Integer (I), 4, Stream.Output_Base);
-         Put (Stream.Target, " ");
+      for I of Stream.Buffer loop
+         Put_Line (Stream.Target, -(+"%03f;%02d" & To_Duration (I.Time) & Integer (I.Data)));
       end loop;
-      Stream.Cursor := Stream.Buffer'First;
-      New_Line (Stream.Target);
+      Stream.Buffer.Clear;
    end Write;
 
    not overriding procedure Put_Header
-     (Stream  : in out Timed_Output_Stream) is
+     (Stream  : in out Timed_Stream) is
    begin
       Stream.Put_Line ("-- -----------------------------------------------");
       Stream.Put_Line ("--  Sampling started : " & GNAT.Time_Stamp.Current_Time);
@@ -159,8 +159,9 @@ package body Stream_Tools.Timed_Output_Streams is
       Stream.Put_Line ("--    By user        : " & Ada.Environment_Variables.Value ("USER"));
       Stream.Put_Line ("-- -----------------------------------------------");
    end Put_Header;
+
    not overriding procedure Put_Footer
-     (Stream  : in out Timed_Output_Stream) is
+     (Stream  : in out Timed_Stream) is
    begin         Stream.New_Line;
       Stream.Put_Line ("-- -----------------------------------------------");
       Stream.Put_Line ("--  Sampling Ended    : " & GNAT.Time_Stamp.Current_Time);
@@ -169,4 +170,4 @@ package body Stream_Tools.Timed_Output_Streams is
 
    end Put_Footer;
 
-end Stream_Tools.Timed_Output_Streams;
+end Stream_Tools.Timed_Streams;

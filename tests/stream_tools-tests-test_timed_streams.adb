@@ -23,57 +23,39 @@
 --  OTHER DEALINGS IN THE SOFTWARE.                                          --
 -------------------------------------------------------------------------------
 
-with Stream_Tools.Bufferd_Streams;
-with GNAT.Traceback.Symbolic;
+with Stream_Tools.Timed_Streams.Output;
+with Stream_Tools.Timed_Streams.Input;
 with GNAT.Exception_Traces;
-with Ada.Text_IO; use Ada.Text_IO;
-with Ada.Streams; use Ada.Streams;
-with Ada.Assertions; use Ada.Assertions;
-with System; use System;
-
-procedure Stream_Tools.Tests.Main is
-   B : aliased Stream_Tools.Bufferd_Streams.Bufferd_Stream (6, System.Default_Priority);
-   I : Ada.Streams.Stream_Element_Array (1 .. 4) := (others => 0);
-
+with GNAT.Traceback.Symbolic;
+with Ada.Real_Time;
+with GNAT.IO; use GNAT.IO;
+procedure Stream_Tools.Tests.Test_Timed_Streams is
+   use Ada.Real_Time;
+   O : aliased Stream_Tools.Timed_Streams.Output.Timed_Output_Stream;
 begin
-   GNAT.Exception_Traces.Set_Trace_Decorator (GNAT.Traceback.Symbolic.Symbolic_Traceback'Access);
    GNAT.Exception_Traces.Trace_On (GNAT.Exception_Traces.Every_Raise);
-   Short_Short_Integer'Write (B'Access, 1);
-   Short_Short_Integer'Write (B'Access, 2);
-   Short_Short_Integer'Write (B'Access, 3);
-   Short_Short_Integer'Write (B'Access, 4);
-   Short_Short_Integer'Write (B'Access, 5);
-   Short_Short_Integer'Write (B'Access, 6);
+   GNAT.Exception_Traces.Set_Trace_Decorator (GNAT.Traceback.Symbolic.Symbolic_Traceback'Access);
+   O.Create ("test");
+   Integer'Write (O'Access, 1);
+   delay 0.2;
+   Integer'Write (O'Access, 2);
+   delay 0.2;
+   Integer'Write (O'Access, 3);
+   O.Close;
+   declare
+      I : aliased Stream_Tools.Timed_Streams.Input.Timed_Input_Stream;
+      Now : constant Ada.Real_Time.Time := Ada.Real_Time.Clock;
+      Data : Integer := 0;
+   begin
+      I.Open ("test");
+      Put_Line (To_Duration (Clock - Now)'Img & " : " & Data'Img);
+      Integer'Read (I'Access, Data);
+      Put_Line (To_Duration (Clock - Now)'Img & " : " & Data'Img);
+      Integer'Read (I'Access, Data);
+      Put_Line (To_Duration (Clock - Now)'Img & " : " & Data'Img);
+      Integer'Read (I'Access, Data);
+      Put_Line (To_Duration (Clock - Now)'Img & " : " & Data'Img);
+      I.Close;
+   end;
 
-   I := (others => 0);
-   Ada.Streams.Stream_Element_Array'Read (B'Access, I);
---     Assert (I = (1, 2, 3, 4), "");
-   Put_Line ("---------------------");
-   Short_Short_Integer'Write (B'Access, 7);
-   Short_Short_Integer'Write (B'Access, 8);
-
-   I := (others => 0);
-   Ada.Streams.Stream_Element_Array'Read (B'Access, I);
---     Assert (I = (5, 6, 7, 8), "");
-   Put_Line ("---------------------");
-
-   Short_Short_Integer'Write (B'Access, 1);
-   Short_Short_Integer'Write (B'Access, 2);
-   Short_Short_Integer'Write (B'Access, 3);
-   Short_Short_Integer'Write (B'Access, 4);
-   I := (others => 0);
-   Ada.Streams.Stream_Element_Array'Read (B'Access, I);
---     Assert (I = (1, 2, 3, 4), "");
-
-   Short_Short_Integer'Write (B'Access, 1);
-   Short_Short_Integer'Write (B'Access, 2);
-   Short_Short_Integer'Write (B'Access, 3);
-   Short_Short_Integer'Write (B'Access, 4);
-   I := (others => 0);
-   Ada.Streams.Stream_Element_Array'Read (B'Access, I);
-   Assert (I = (1, 2, 3, 4), "");
-   I := (1, 2, 3, 4);
-   --  Stream_Element_Array'Write (B'Access, Stream_Element_Array'(1, 2, 3, 4));
-   Stream_Element_Array'Write (B'Access, I);
-
-end Stream_Tools.Tests.Main;
+end Stream_Tools.Tests.Test_Timed_Streams;

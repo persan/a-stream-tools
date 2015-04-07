@@ -26,70 +26,61 @@
 with Ada.Streams;
 with Ada.Real_Time;
 with Ada.Text_IO;
-package Stream_Tools.Timed_Output_Streams is
+with Ada.Containers.Vectors;
+package Stream_Tools.Timed_Streams is
 
-   type Timed_Output_Stream (Size : Ada.Streams.Stream_Element_Offset)
-     is new Ada.Streams.Root_Stream_Type with private;
+   type Timed_Stream is abstract new Ada.Streams.Root_Stream_Type with private;
 
    not overriding procedure Create
-     (Stream      : in out Timed_Output_Stream;
+     (Stream      : in out Timed_Stream;
       Path        : String;
-      Output_Base : Ada.Text_IO.Number_Base := 16;
-      With_Header : Boolean := True;
-      Append      : Boolean := False;
-      Spacing     : Ada.Real_Time.Time_Span := Ada.Real_Time.To_Time_Span (0.1));
+      With_Header : Boolean := True);
 
-   not overriding procedure Set_Output_Base
-     (Stream  : in out Timed_Output_Stream;
-      To      : Ada.Text_IO.Number_Base);
+   not overriding procedure Open
+     (Stream      : in out Timed_Stream;
+      Path        : String);
 
    not overriding procedure Put_Line
-     (Stream  : in out Timed_Output_Stream;
+     (Stream  : in out Timed_Stream;
       Item    : String);
 
    not overriding procedure New_Line
-     (Stream  : in out Timed_Output_Stream;
+     (Stream  : in out Timed_Stream;
       Spacing : Ada.Text_IO.Positive_Count := 1);
 
    not overriding procedure Close
-     (Stream  : in out Timed_Output_Stream);
+     (Stream  : in out Timed_Stream);
 
-   overriding procedure Read
-     (Stream : in out Timed_Output_Stream;
-      Item   : out Ada.Streams.Stream_Element_Array;
-      Last   : out Ada.Streams.Stream_Element_Offset)
-   is null;
+   not overriding procedure Write
+     (Stream : in out Timed_Stream;
+      Item   : Ada.Streams.Stream_Element);
 
-   overriding procedure Write
-     (Stream : in out Timed_Output_Stream;
-      Item   : Ada.Streams.Stream_Element_Array);
-
-   not overriding procedure Flush
-     (Stream : in out Timed_Output_Stream);
-
-   not overriding procedure Tick
-     (Stream : in out Timed_Output_Stream);
+   not overriding procedure Read
+     (Stream : in out Timed_Stream;
+      Item   : out Ada.Streams.Stream_Element);
 
    not overriding procedure Put_Header
-     (Stream  : in out Timed_Output_Stream);
+     (Stream  : in out Timed_Stream);
 
    not overriding procedure Put_Footer
-     (Stream  : in out Timed_Output_Stream);
+     (Stream  : in out Timed_Stream);
 
 private
-   type Timed_Output_Stream (Size : Ada.Streams.Stream_Element_Offset)
-     is  new Ada.Streams.Root_Stream_Type with record
-      Buffer       : Ada.Streams.Stream_Element_Array (1 .. Size);
-      Cursor       : Ada.Streams.Stream_Element_Offset;
-      Last         : Ada.Streams.Stream_Element_Offset;
-      Target       : Ada.Text_IO.File_Type;
-      Spacing      : Ada.Real_Time.Time_Span;
-      Message_Time : Ada.Real_Time.Time;
-      Start_Time   : Ada.Real_Time.Time;
-      Output_Base  : Ada.Text_IO.Number_Base;
-      With_Header  : Boolean;
+   type Simple_Event is record
+      Time : Ada.Real_Time.Time_Span;
+      Data : Ada.Streams.Stream_Element;
    end record;
-   not overriding procedure Write
-     (Stream : in out Timed_Output_Stream);
+   package Event_Vectors is new Ada.Containers.Vectors (Positive, Simple_Event);
+   type Timed_Stream is abstract new Ada.Streams.Root_Stream_Type with record
+      Buffer       : Event_Vectors.Vector;
+      Start_Time   : Ada.Real_Time.Time;
+      C            : Event_Vectors.Cursor;
+      Target       : Ada.Text_IO.File_Type;
+      With_Header  : Boolean := False;
+      Mode         : Ada.Text_IO.File_Mode;
+   end record;
 
-end Stream_Tools.Timed_Output_Streams;
+   not overriding procedure Write
+     (Stream : in out Timed_Stream);
+
+end Stream_Tools.Timed_Streams;

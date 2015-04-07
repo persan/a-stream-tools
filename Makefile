@@ -23,7 +23,8 @@ all:
 compile:
 	gprbuild -p -j0 -P ${_project}  -XLIBRARY_TYPE=relocatable
 	gprbuild -p -j0 -P ${_project}  -XLIBRARY_TYPE=static
-	gprbuild -p -j0 -P version.gpr
+	gprbuild -p -j0 -P version.gpr  -XLIBRARY_TYPE=static
+	./bin/version
 
 generate-tests:
 	gnattest -P ${_project}
@@ -50,7 +51,7 @@ install:
 	mkdir -p ${INSTALL_DIR}${projectdir}
 	mkdir -p ${INSTALL_DIR}${libdir}
 	cp -f  src/*.ad? ${INSTALL_DIR}${includedir}
-	cp -f ${_project}.gpr.in ${INSTALL_DIR}${projectdir}/${_project}.gpr
+	sed "s-%{VERSION}-$(shell bin/version)-"  <${_project}.gpr.in >${INSTALL_DIR}${projectdir}/${_project}.gpr
 	cp -rf lib/* ${INSTALL_DIR}${libdir}
 
 
@@ -62,7 +63,8 @@ uninstall:
 
 
 clean:
-	gprclean -P ${_project}
+	-gprclean -P ${_project}  -XLIBRARY_TYPE=relocatable
+	-gprclean -P ${_project}  -XLIBRARY_TYPE=static
 	rm -rf .obj/* bin/* lib/*
 
 .PHONY:

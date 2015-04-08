@@ -31,8 +31,8 @@ package Stream_Tools.Timed_Streams.Output is
    overriding procedure Read
      (Stream : in out Timed_Output_Stream;
       Item   : out Ada.Streams.Stream_Element_Array;
-      Last   : out Ada.Streams.Stream_Element_Offset) with
-     No_Return => True;
+      Last   : out Ada.Streams.Stream_Element_Offset);
+   pragma No_Return (Read);
 
    overriding procedure Write
      (Stream : in out Timed_Output_Stream;
@@ -41,8 +41,8 @@ package Stream_Tools.Timed_Streams.Output is
    overriding procedure Open
      (Stream      : in out Timed_Output_Stream;
       Path        : String;
-      Ignore_EOF  : Boolean := False) with
-     No_Return => True;
+      Ignore_EOF  : Boolean := False);
+   pragma No_Return (Open);
 
 private
 

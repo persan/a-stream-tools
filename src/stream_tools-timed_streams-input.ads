@@ -35,14 +35,14 @@ package Stream_Tools.Timed_Streams.Input is
 
    overriding procedure Write
      (Stream : in out Timed_Input_Stream;
-      Item   : Ada.Streams.Stream_Element_Array) with
-     No_Return => True;
+      Item   : Ada.Streams.Stream_Element_Array);
+   pragma No_Return (Write);
 
    overriding procedure Create
      (Stream      : in out Timed_Input_Stream;
       Path        : String;
-      With_Header : Boolean := True) with
-     No_Return => True;
+      With_Header : Boolean := True);
+   pragma No_Return (Create);
 
 private
 

@@ -8,9 +8,10 @@ datadir=${prefix}/share/${_project}
 docdir=${prefix}/share/doc/${_project}
 projectdir=${prefix}/lib/gnat
 
+export PATH:=${CURDIR}/bin:${PATH}
 help:
 	echo Help text
-	echo ${prefix}
+	echo ${PATH}
 	echo ${bindir}
 	echo ${datadir}
 	echo ${docdir}
@@ -38,11 +39,11 @@ generate_tests:
 test:
 	bin/${_project}-test-main
 
-dist:version
-	git clone . $(_project)-$(shell ./version)
-	rm -rf $(_project)-$(shell ./version)/.git
-	tar -czf $(_project)-$(shell ./version).tgz $(_project)-$(shell ./version)
-	rm -rf $(_project)-$(shell ./version)
+dist:compile
+	git clone . $(_project)-$(shell bin/version)
+	rm -rf $(_project)-$(shell bin/version)/.git
+	tar -czf $(_project)-$(shell bin/version).tgz $(_project)-$(shell bin/version)
+	rm -rf $(_project)-$(shell bin/version)
 
 
 install:

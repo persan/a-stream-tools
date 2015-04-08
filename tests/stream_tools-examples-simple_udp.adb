@@ -12,6 +12,7 @@ begin
    String'Write (S'Access, "Funn");
    Integer'Write (S'Access, 123);
 
-   Memory_Streams.Memory_Stream'Write (Outf'Access, S);
+--    Memory_Streams.Memory_Stream'Write (Outf'Access, S);
+   Memory_Streams.Write (Outf'Access, S);
    Outf.Close;
 end Stream_Tools.Examples.Simple_UDP;

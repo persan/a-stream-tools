@@ -52,7 +52,7 @@ begin
       Data : Integer := 0;
       D0   : Short_Short_Integer;
    begin
-      I.Open ("test");
+      I.Open ("test", Ignore_EOF => True);
       for J in 1 .. 4 loop
          Put_Line (To_Duration (Clock - Now)'Img & " : " & Data'Img);
          Integer'Read (I'Access, Data);

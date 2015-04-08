@@ -134,8 +134,8 @@ package body Stream_Tools.Timed_Streams is
          Stream.Start_Time := Ada.Real_Time.Clock;
       end if;
       if Has_Element (Stream.C) then
-         delay until Stream.Start_Time + Stream.Buffer (Stream.C).Time;
-         Item := Stream.Buffer (Stream.C).Data;
+         delay until Stream.Start_Time + Element (Stream.C).Time;
+         Item := Element (Stream.C).Data;
          Stream.C := Next (Stream.C);
       elsif Stream.Null_EOF then
          Item := 0;
@@ -147,10 +147,14 @@ package body Stream_Tools.Timed_Streams is
    not overriding procedure Write
      (Stream : in out Timed_Stream) is
       use GNAT.Formatted_String;
-   begin
-      for I of Stream.Buffer loop
+      procedure Process (Position : Cursor);
+      procedure Process (Position : Cursor) is
+         I : constant Simple_Event := Element (Position);
+      begin
          Put_Line (Stream.Target, -(+"%03f;%02d" & To_Duration (I.Time) & Integer (I.Data)));
-      end loop;
+      end Process;
+   begin
+      Stream.Buffer.Iterate (Process'Access);
       Stream.Buffer.Clear;
    end Write;
 

@@ -30,7 +30,7 @@ project Stream_Tools is
    type Library_Type_Kind is ("static","relocatable");
    type Boolean is ("True", "False");
 
-   Library_Type : Library_Type_Kind  := external ("LIBRARY_TYPE");
+   Library_Type : Library_Type_Kind  := external ("LIBRARY_TYPE","static");
    STREAM_TOOLS_USE_OLD_GNAT : Boolean := external ("STREAM_TOOLS_USE_OLD_GNAT", "False");
 
    for Languages use ("Ada", "Makefile", "Text");

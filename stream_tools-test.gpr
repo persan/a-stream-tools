@@ -1,5 +1,4 @@
 with "version";
-with "aunit.gpr";
 with "stream_tools.gpr";
 project Stream_Tools.Test is
 

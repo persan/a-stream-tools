@@ -100,17 +100,17 @@ package Stream_Tools.Memory_Streams is
 
    type Memory_Stream is limited new Ada.Streams.Root_Stream_Type
      and Memory_Stream_Interface
-   with private with
-     Read => Read,
-     Write => Write;
-
-   procedure Read
+   with private;
+   procedure Read_Memory_Stream
      (This : not null access Ada.Streams.Root_Stream_Type'Class;
       Item : out Memory_Stream);
 
-   procedure Write
+   procedure Write_Memory_Stream
      (This : not null access Ada.Streams.Root_Stream_Type'Class;
       Item : Memory_Stream);
+
+   for Memory_Stream'Read use Read_Memory_Stream;
+   for Memory_Stream'Write use Write_Memory_Stream;
 
    type Any_Memory_Stream is access all Memory_Stream'Class;
 
@@ -174,31 +174,31 @@ package Stream_Tools.Memory_Streams is
                             Add_Initial_Size);
    type Dynamic_Memory_Stream
      (Initial_Size : Ada.Streams.Stream_Element_Offset;
-      Strategy     : Expand_Strategy) is new Memory_Stream with private with
-     Read   => Read,
-     Write  => Write,
-     Input  => Input,
-     Output => Output;
+      Strategy     : Expand_Strategy) is new Memory_Stream with private;
 
    overriding procedure Write
      (This : in out Dynamic_Memory_Stream;
       Item   : Ada.Streams.Stream_Element_Array);
 
-   overriding procedure Read
+   procedure Read_Dynamic_Memory_Stream
      (This : not null access Ada.Streams.Root_Stream_Type'Class;
       Item : out Dynamic_Memory_Stream);
 
-   overriding procedure Write
+   procedure Write_Dynamic_Memory_Stream
      (This : not null access Ada.Streams.Root_Stream_Type'Class;
       Item : Dynamic_Memory_Stream);
 
-   function Input
+   function Input_Dynamic_Memory_Stream
      (This : not null access Ada.Streams.Root_Stream_Type'Class)
       return Dynamic_Memory_Stream;
 
-   procedure Output
+   procedure Output_Dynamic_Memory_Stream
      (This : not null access Ada.Streams.Root_Stream_Type'Class;
       Item   : Dynamic_Memory_Stream);
+   for Dynamic_Memory_Stream'Read use Read_Dynamic_Memory_Stream;
+   for Dynamic_Memory_Stream'Write use Write_Dynamic_Memory_Stream;
+   for Dynamic_Memory_Stream'Input use Input_Dynamic_Memory_Stream;
+   for Dynamic_Memory_Stream'Output use Output_Dynamic_Memory_Stream;
 
 private
    subtype large_buffer is

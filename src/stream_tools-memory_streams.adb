@@ -158,16 +158,16 @@ package body Stream_Tools.Memory_Streams is
       This.Cursor := This.Buffer.As_Pointer.all'First;
    end Reset;
 
-   procedure Read
+   procedure Read_Memory_Stream
      (This   : not null access Ada.Streams.Root_Stream_Type'Class;
       Item   : out Memory_Stream) is
       pragma Unreferenced (This, Item);
    begin
       raise Program_Error with
         "Its not possible to read into a memory stream using 'read";
-   end Read;
+   end Read_Memory_Stream;
 
-   procedure Write
+   procedure Write_Memory_Stream
      (This   : not null access Ada.Streams.Root_Stream_Type'Class;
       Item   : Memory_Stream) is
    begin
@@ -175,16 +175,16 @@ package body Stream_Tools.Memory_Streams is
         (This,
          Item.Buffer.As_Pointer.all
            (Item.Buffer.As_Pointer.all'First .. Item.Cursor));
-   end Write;
+   end Write_Memory_Stream;
 
-   overriding procedure Read
+   procedure Read_Dynamic_Memory_Stream
      (This   : not null access Ada.Streams.Root_Stream_Type'Class;
       Item   : out Dynamic_Memory_Stream) is
    begin
-      Read (This, Memory_Stream (Item));
-   end Read;
+      Read_Memory_Stream (This, Memory_Stream (Item));
+   end Read_Dynamic_Memory_Stream;
 
-   function Input
+   function Input_Dynamic_Memory_Stream
      (This : not null access Ada.Streams.Root_Stream_Type'Class)
       return Dynamic_Memory_Stream is
       Initial_Size : Ada.Streams.Stream_Element_Offset;
@@ -195,23 +195,23 @@ package body Stream_Tools.Memory_Streams is
       return Ret : Dynamic_Memory_Stream (Initial_Size, Strategy) do
          Ada.Streams.Stream_Element_Array'Write (This, Ret.Buffer.As_Pointer.all (0 .. Initial_Size - 1));
       end return;
-   end Input;
+   end Input_Dynamic_Memory_Stream;
 
-   procedure Output
+   procedure Output_Dynamic_Memory_Stream
      (This : not null access Ada.Streams.Root_Stream_Type'Class;
       Item   : Dynamic_Memory_Stream) is
    begin
       Ada.Streams.Stream_Element_Offset'Write (This, Item.Cursor - 1);
       Expand_Strategy'Write (This, Item.Strategy);
       Ada.Streams.Stream_Element_Array'Write (This, Item.Buffer.As_Pointer.all (0 .. Item.Cursor - 1));
-   end Output;
+   end Output_Dynamic_Memory_Stream;
 
-   overriding procedure Write
+   procedure Write_Dynamic_Memory_Stream
      (This   : not null access Ada.Streams.Root_Stream_Type'Class;
       Item   : Dynamic_Memory_Stream) is
    begin
-      Write (This, Memory_Stream (Item));
-   end Write;
+      Write_Memory_Stream (This, Memory_Stream (Item));
+   end Write_Dynamic_Memory_Stream;
 
    overriding procedure Write
      (This   : in out Dynamic_Memory_Stream;

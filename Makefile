@@ -45,6 +45,10 @@ dist:compile
 	tar -czf $(_project)-$(shell bin/version).tgz $(_project)-$(shell bin/version)
 	rm -rf $(_project)-$(shell bin/version)
 
+tag:
+	${MAKE} compile
+	git tag -f "$(shell bin/version --version)-$(shell bin/version --date)"
+	${MAKE} dist
 
 install:
 	#gprinstall -p -P ${_project}

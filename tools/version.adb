@@ -1,12 +1,25 @@
 with Stream_Tools;
-with Ada.Text_IO;
-with Ada.Command_Line;
+with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Command_Line; use Ada.Command_Line;
 procedure Version is
 begin
    if $VERSION = Stream_Tools.Version then
-      Ada.Text_IO.Put_Line (Stream_Tools.Version);
+      if Argument_Count > 0 then
+         for I in 1 .. Argument_Count loop
+            if Argument (I) = "--version" then
+               Put (Stream_Tools.Version);
+            elsif Argument (I) = "--date" then
+               Put (Stream_Tools.Version_Date);
+            else
+               Put (Argument (I));
+            end if;
+            New_Line;
+         end loop;
+      else
+         Put_Line (Stream_Tools.Version);
+      end if;
    else
-      Ada.Text_IO.Put_Line ("Version mismatch (ProjectFile: " & $VERSION & ") /=  (Source: " &  Stream_Tools.Version & ").");
-      Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
+      Put_Line ("Version mismatch (ProjectFile: " & $VERSION & ") /=  (Source: " &  Stream_Tools.Version & ").");
+      Set_Exit_Status (Failure);
    end if;
 end Version;

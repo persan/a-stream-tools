@@ -4,3 +4,6 @@ version
 *.tgz
 .obj
 _
+_*
+Makefile.conf
+*~

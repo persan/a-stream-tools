@@ -1,14 +1,23 @@
 _project=stream_tools
-prefix=$(shell dirname $(shell dirname $(shell which gnatls)))
+__prefix=$(shell dirname $(shell dirname $(shell which gnatls)))
 
-includedir=${prefix}/include/${_project}
-bindir=${prefix}/bin
-libdir=${prefix}/lib/${_project}
-datadir=${prefix}/share/${_project}
-docdir=${prefix}/share/doc/${_project}
-projectdir=${prefix}/lib/gnat
 
-export PATH:=${CURDIR}/bin:${PATH}
+-include Makefile.conf
+all:
+Makefile.conf:Makefile
+	echo "prefix=${__prefix}" >${@}
+	echo "includedir=${__prefix}/include/${_project}" >>${@}
+	echo "bindir=${__prefix}/bin" >>${@}
+	echo "libdir=${__prefix}/lib/${_project}" >>${@}
+	echo "datadir=${__prefix}/share/${_project}" >>${@}
+	echo "docdir=${__prefix}/share/doc/${_project}" >>${@}
+	echo "projectdir=${__prefix}/lib/gnat" >>${@}
+	echo "export PATH:=${CURDIR}/bin:${PATH}" >>${@}
+
+all: 
+	${MAKE} clean
+	${MAKE} compile
+
 help:
 	echo Help text
 	echo ${PATH}
@@ -18,8 +27,6 @@ help:
 
 setup:
 	# Do set up and code generation
-
-all:
 
 compile:
 	gprbuild -p -j0 -P ${_project}  -XLIBRARY_TYPE=relocatable

@@ -1,10 +1,16 @@
 _project=stream_tools
-__prefix=$(shell dirname $(shell dirname $(shell which gnatls)))
-
 
 -include Makefile.conf
+
+__prefix=$(shell dirname $(shell dirname $(shell which gnatls)))
+ifeq (${TARGET},"native")
+I_TARGET=
+else
+I_TARGET=--target=${TARGET} -XTARGET=${TARGET}  --prefix=${__prefix}/${TARGET}
+endif
+
 all:
-Makefile.conf:Makefile
+Makefile.conf:Makefile # IGNORE
 	echo "prefix=${__prefix}" >${@}
 	echo "includedir=${__prefix}/include/${_project}" >>${@}
 	echo "bindir=${__prefix}/bin" >>${@}
@@ -14,7 +20,7 @@ Makefile.conf:Makefile
 	echo "projectdir=${__prefix}/lib/gnat" >>${@}
 	echo "export PATH:=${CURDIR}/bin:${PATH}" >>${@}
 
-all: 
+all:
 	${MAKE} clean
 	${MAKE} compile
 
@@ -58,13 +64,13 @@ tag:
 	${MAKE} dist
 
 install:
-	#gprinstall -p -P ${_project}
-	mkdir -p ${INSTALL_DIR}${includedir}
-	mkdir -p ${INSTALL_DIR}${projectdir}
-	mkdir -p ${INSTALL_DIR}${libdir}
-	cp -f  src/*.ad? ${INSTALL_DIR}${includedir}
-	sed "s-%{VERSION}-$(shell bin/version)-"  <${_project}.gpr.in >${INSTALL_DIR}${projectdir}/${_project}.gpr
-	cp -rf lib/* ${INSTALL_DIR}${libdir}
+	gprinstall -p -P ${_project} ${I_TARGET}
+#	mkdir -p ${INSTALL_DIR}${includedir}
+#	mkdir -p ${INSTALL_DIR}${projectdir}
+#	mkdir -p ${INSTALL_DIR}${libdir}
+#	cp -f  src/*.ad? ${INSTALL_DIR}${includedir}
+#	sed "s-%{VERSION}-$(shell bin/version)-"  <${_project}.gpr.in >${INSTALL_DIR}${projectdir}/${_project}.gpr
+#	cp -rf lib/* ${INSTALL_DIR}${libdir}
 
 
 uninstall:
@@ -77,6 +83,6 @@ uninstall:
 clean:
 	-gprclean -P ${_project}  -XLIBRARY_TYPE=relocatable
 	-gprclean -P ${_project}  -XLIBRARY_TYPE=static
-	rm -rf .obj/* bin/* lib/*
+	rm -rf .obj/* bin/* lib/* Makefile.conf
 
 .PHONY:

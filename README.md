@@ -21,10 +21,10 @@ Provides a set of utilities for streams such as:
  end;
 `````
 
-Tested with GNATPro 7.4 and GCC 4.6(Raspian)
+Tested with GNATPro 7.4 and GCC 4.6(Raspian) GNATGPL-2015 cross
 
 Installation
-make compile
-make install
+make
+sudo make install
 
 NOTE! in order to use an old GCC the environment variable STREAM_TOOLS_USE_OLD_GNAT must be set to True.

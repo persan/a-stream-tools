@@ -26,6 +26,7 @@
 with Ada.Streams;
 with System;
 with Ada.Finalization;
+with GNAT.Sockets;
 package Stream_Tools.Memory_Streams is
    use Ada;
    --  Memory_Streams implements stream functionality to be mapped to any
@@ -49,12 +50,12 @@ package Stream_Tools.Memory_Streams is
      all Memory_Stream_Interface'Class;
    --
    procedure Read
-     (This : in out Memory_Stream_Interface;
+     (This   : in out Memory_Stream_Interface;
       Item   : out Ada.Streams.Stream_Element_Array;
       Last   : out Ada.Streams.Stream_Element_Offset) is abstract;
 
    procedure Write
-     (This : in out Memory_Stream_Interface;
+     (This   : in out Memory_Stream_Interface;
       Item   : Ada.Streams.Stream_Element_Array) is abstract;
 
    function Get_Address
@@ -124,7 +125,7 @@ package Stream_Tools.Memory_Streams is
 
    overriding
    function Get_Length (This : Memory_Stream)
-                                   return Ada.Streams.Stream_Element_Count;
+                        return Ada.Streams.Stream_Element_Count;
    --  Returns the full length of the buffer.
 
    overriding
@@ -155,18 +156,18 @@ package Stream_Tools.Memory_Streams is
 
    overriding
    procedure Dump
-     (This      : Memory_Stream;
+     (This        : Memory_Stream;
       Full_Buffer : Boolean := False);
    --  Dumps the contents of the buffer from the first element
    --  to the cursor.
 
    overriding procedure Read
-     (This : in out Memory_Stream;
+     (This   : in out Memory_Stream;
       Item   : out Ada.Streams.Stream_Element_Array;
       Last   : out Ada.Streams.Stream_Element_Offset);
 
    overriding procedure Write
-     (This : in out Memory_Stream;
+     (This   : in out Memory_Stream;
       Item   : Ada.Streams.Stream_Element_Array);
 
    type Expand_Strategy is (As_Needed,
@@ -177,7 +178,7 @@ package Stream_Tools.Memory_Streams is
       Strategy     : Expand_Strategy) is new Memory_Stream with private;
 
    overriding procedure Write
-     (This : in out Dynamic_Memory_Stream;
+     (This   : in out Dynamic_Memory_Stream;
       Item   : Ada.Streams.Stream_Element_Array);
 
    procedure Read_Dynamic_Memory_Stream
@@ -193,21 +194,29 @@ package Stream_Tools.Memory_Streams is
       return Dynamic_Memory_Stream;
 
    procedure Output_Dynamic_Memory_Stream
-     (This : not null access Ada.Streams.Root_Stream_Type'Class;
+     (This   : not null access Ada.Streams.Root_Stream_Type'Class;
       Item   : Dynamic_Memory_Stream);
    for Dynamic_Memory_Stream'Read use Read_Dynamic_Memory_Stream;
    for Dynamic_Memory_Stream'Write use Write_Dynamic_Memory_Stream;
    for Dynamic_Memory_Stream'Input use Input_Dynamic_Memory_Stream;
    for Dynamic_Memory_Stream'Output use Output_Dynamic_Memory_Stream;
 
+   procedure Send_Socket
+     (Socket : GNAT.Sockets.Socket_Type;
+      Item   : Memory_Stream;
+      Last   : out Ada.Streams.Stream_Element_Offset;
+      To     : access GNAT.Sockets.Sock_Addr_Type;
+      Flags  : GNAT.Sockets.Request_Flag_Type := GNAT.Sockets.No_Request_Flag);
+   --  Sends the whole contents of the stored Stream to a socket.
+
 private
-   subtype large_buffer is
+   subtype Large_Buffer is
      Streams.Stream_Element_Array (0 .. Streams.Stream_Element_Offset'Last);
-   type Large_Buffer_Access is access large_buffer;
+   type Large_Buffer_Access is access Large_Buffer;
    for Large_Buffer_Access'Storage_Size use 0;
 
-   type Large_Buffer_Union (ref  : Boolean := False) is record
-      case ref is
+   type Large_Buffer_Union (Ref  : Boolean := False) is record
+      case Ref is
       when True =>
          As_Address : System.Address;
       when False =>
@@ -224,23 +233,23 @@ private
       Cursor        : Streams.Stream_Element_Offset := 0;
    end record;
 
-   type controler (controled : not null access Dynamic_Memory_Stream)
-     is new Ada.Finalization.Limited_Controlled with null record;
+   type Controler (Controled : not null access Dynamic_Memory_Stream)
+   is new Ada.Finalization.Limited_Controlled with null record;
 
-   overriding procedure Initialize (This : in out controler);
-   overriding procedure Finalize   (This : in out controler);
+   overriding procedure Initialize (This : in out Controler);
+   overriding procedure Finalize   (This : in out Controler);
 
    type Dynamic_Memory_Stream
      (Initial_Size : Streams.Stream_Element_Offset;
       Strategy     : Expand_Strategy) is new Memory_Stream with record
-      C : controler (Dynamic_Memory_Stream'Access);
+      C : Controler (Dynamic_Memory_Stream'Access);
    end record;
 
    procedure Initialize (This : in out Dynamic_Memory_Stream);
    procedure Finalize   (This : in out Dynamic_Memory_Stream);
 
    procedure Expand
-     (This : in out Dynamic_Memory_Stream;
-      to_Size : Ada.Streams.Stream_Element_Offset);
+     (This    : in out Dynamic_Memory_Stream;
+      To_Size : Ada.Streams.Stream_Element_Offset);
 
 end Stream_Tools.Memory_Streams;

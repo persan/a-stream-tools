@@ -198,7 +198,7 @@ package body Stream_Tools.Memory_Streams is
    end Input_Dynamic_Memory_Stream;
 
    procedure Output_Dynamic_Memory_Stream
-     (This : not null access Ada.Streams.Root_Stream_Type'Class;
+     (This   : not null access Ada.Streams.Root_Stream_Type'Class;
       Item   : Dynamic_Memory_Stream) is
    begin
       Ada.Streams.Stream_Element_Offset'Write (This, Item.Cursor - 1);
@@ -225,23 +225,23 @@ package body Stream_Tools.Memory_Streams is
 
    procedure Expand
      (This    : in out Dynamic_Memory_Stream;
-      to_Size : Ada.Streams.Stream_Element_Offset) is
-      new_Size : System.Memory.size_t := 0;
+      To_Size : Ada.Streams.Stream_Element_Offset) is
+      New_Size : System.Memory.size_t := 0;
       use System.Memory;
    begin
-      while new_Size < size_t (to_Size) loop
+      while New_Size < size_t (To_Size) loop
          case This.Strategy is
          when As_Needed =>
-            new_Size := size_t (to_Size);
+            New_Size := size_t (To_Size);
          when Multiply_By_Two =>
-            new_Size := size_t (2 * This.Buffer_Length);
+            New_Size := size_t (2 * This.Buffer_Length);
          when Add_Initial_Size =>
-            new_Size := size_t (This.Buffer_Length + This.Initial_Size);
+            New_Size := size_t (This.Buffer_Length + This.Initial_Size);
          end case;
       end loop;
       This.Buffer.As_Address :=  System.Memory.Realloc
-        (This.Buffer.As_Address, new_Size);
-      This.Buffer_Length := Streams.Stream_Element_Count (new_Size);
+        (This.Buffer.As_Address, New_Size);
+      This.Buffer_Length := Streams.Stream_Element_Count (New_Size);
    end Expand;
 
    procedure Initialize (This : in out Dynamic_Memory_Stream) is
@@ -258,15 +258,29 @@ package body Stream_Tools.Memory_Streams is
       System.Memory.Free (This.Buffer.As_Address);
    end Finalize;
 
-   overriding procedure Initialize (This : in out controler) is
+   overriding procedure Initialize (This : in out Controler) is
       use System.Memory;
    begin
-      This.controled.Initialize;
+      This.Controled.Initialize;
    end Initialize;
 
-   overriding procedure Finalize   (This : in out controler) is
+   overriding procedure Finalize   (This : in out Controler) is
    begin
-      This.controled.Finalize;
+      This.Controled.Finalize;
    end Finalize;
 
+   procedure Send_Socket
+     (Socket :     GNAT.Sockets.Socket_Type;
+      Item   :     Memory_Stream;
+      Last   : out Ada.Streams.Stream_Element_Offset;
+      To     :     access GNAT.Sockets.Sock_Addr_Type;
+      Flags  :     GNAT.Sockets.Request_Flag_Type := GNAT.Sockets.No_Request_Flag) is
+   begin
+      GNAT.Sockets.Send_Socket
+        (Socket => Socket,
+         Item   => Item.Buffer.As_Pointer.all (Item.Buffer.As_Pointer.all'First .. Item.Cursor - 1),
+         Last   => Last,
+         To     => To,
+         Flags  => Flags);
+   end Send_Socket;
 end Stream_Tools.Memory_Streams;

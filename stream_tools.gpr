@@ -24,7 +24,9 @@
 -------------------------------------------------------------------------------
 
 project Stream_Tools is
+
    Version := "1.0.4";
+
    type Target_type is ("native","arm-eabi","arm-linux-gnueabihf");
    type Library_Type_Kind is ("static","relocatable");
    type Boolean is ("True", "False");

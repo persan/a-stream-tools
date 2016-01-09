@@ -6,7 +6,10 @@ __prefix=$(shell dirname $(shell dirname $(shell which gnatls)))
 ifeq (${TARGET},"native")
 I_TARGET=
 else
+ifdef TARGET
+B_TARGET=--target=${TARGET} -XTARGET=${TARGET}
 I_TARGET=--target=${TARGET} -XTARGET=${TARGET}  --prefix=${__prefix}/${TARGET}
+endif
 endif
 
 all:
@@ -19,9 +22,9 @@ Makefile.conf:Makefile # IGNORE
 	echo "docdir=${__prefix}/share/doc/${_project}" >>${@}
 	echo "projectdir=${__prefix}/lib/gnat" >>${@}
 	echo "export PATH:=${CURDIR}/bin:${PATH}" >>${@}
+	echo "export TARGET:=${TARGET}" >>${@}
 
 all:
-	${MAKE} clean
 	${MAKE} compile
 
 help:
@@ -35,9 +38,9 @@ setup:
 	# Do set up and code generation
 
 compile:
-	gprbuild -p -j0 -P ${_project}  -XLIBRARY_TYPE=relocatable
-	gprbuild -p -j0 -P ${_project}  -XLIBRARY_TYPE=static
-	gprbuild -p -j0 -P version.gpr  -XLIBRARY_TYPE=static
+	gprbuild -p -j0 -P ${_project} ${B_TARGET} -XLIBRARY_TYPE=relocatable
+	gprbuild -p -j0 -P ${_project} ${B_TARGET} -XLIBRARY_TYPE=static
+	gprbuild -p -j0 -P version.gpr -XTARGET=native -XLIBRARY_TYPE=static
 	./bin/version
 
 generate-tests:
@@ -64,13 +67,7 @@ tag:
 	${MAKE} dist
 
 install:
-	gprinstall -p -P ${_project} ${I_TARGET}
-#	mkdir -p ${INSTALL_DIR}${includedir}
-#	mkdir -p ${INSTALL_DIR}${projectdir}
-#	mkdir -p ${INSTALL_DIR}${libdir}
-#	cp -f  src/*.ad? ${INSTALL_DIR}${includedir}
-#	sed "s-%{VERSION}-$(shell bin/version)-"  <${_project}.gpr.in >${INSTALL_DIR}${projectdir}/${_project}.gpr
-#	cp -rf lib/* ${INSTALL_DIR}${libdir}
+	gprinstall -f  -p -P ${_project} ${I_TARGET}
 
 
 uninstall:
@@ -81,8 +78,6 @@ uninstall:
 
 
 clean:
-	-gprclean -P ${_project}  -XLIBRARY_TYPE=relocatable
-	-gprclean -P ${_project}  -XLIBRARY_TYPE=static
-	rm -rf .obj/* bin/* lib/* Makefile.conf
+	rm -rf .obj/* bin/* lib/* Makefile.conf *.tgz _* *~
 
 .PHONY:

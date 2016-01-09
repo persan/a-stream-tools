@@ -242,7 +242,7 @@ private
    type Dynamic_Memory_Stream
      (Initial_Size : Streams.Stream_Element_Offset;
       Strategy     : Expand_Strategy) is new Memory_Stream with record
-      C : Controler (Dynamic_Memory_Stream'Access);
+      C            : Controler (Dynamic_Memory_Stream'Access);
    end record;
 
    procedure Initialize (This : in out Dynamic_Memory_Stream);

@@ -26,15 +26,28 @@
 with Stream_Tools;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Command_Line; use Ada.Command_Line;
+with GNAT.Source_Info;
+with Ada.Calendar;
+with GNAT.Calendar.Time_IO;
 procedure Version is
+   Now : constant String :=
+           GNAT.Calendar.Time_IO.Image
+             (Ada.Calendar.Clock, GNAT.Calendar.Time_IO.ISO_Date);
+   Ver : constant String :=  $VERSION;
 begin
-   if $VERSION = Stream_Tools.Version then
+   if Ver = Stream_Tools.Version then
       if Argument_Count > 0 then
          for I in 1 .. Argument_Count loop
             if Argument (I) = "--version" then
                Put (Stream_Tools.Version);
             elsif Argument (I) = "--date" then
                Put (Stream_Tools.Version_Date);
+            elsif Argument (I) = "--tagcheck" then
+               if Stream_Tools.Version_Date /= Now then
+                  Put ("Date Missmatch (Now: " & Now & ") /=  (Source: " &  Stream_Tools.Version_Date & ").");
+                  Set_Exit_Status (Failure);
+               end if;
+
             else
                Put (Argument (I));
             end if;
@@ -44,7 +57,7 @@ begin
          Put_Line (Stream_Tools.Version);
       end if;
    else
-      Put_Line ("Version mismatch (ProjectFile: " & $VERSION & ") /=  (Source: " &  Stream_Tools.Version & ").");
+      Put_Line ("Version mismatch (ProjectFile: " & Ver & ") /=  (Source: " &  Stream_Tools.Version & ").");
       Set_Exit_Status (Failure);
    end if;
 end Version;

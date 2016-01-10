@@ -65,8 +65,15 @@ dist:compile
 	tar -czf $(_project)-$(shell bin/version).tgz $(_project)-$(shell bin/version)
 	rm -rf $(_project)-$(shell bin/version)
 
-tag:
+tag-check:
+	if [[ ! -z  ` git status --porcelain` ]] ; then \
+		echo "Folder is not clean" ;\
+		git status;\
+		exit 1;\
+        fi
 	${MAKE} compile
+	version --tagcheck
+tag:tag-check
 	git tag -f "$(shell bin/version --version)-$(shell bin/version --date)"
 	${MAKE} dist
 

@@ -31,8 +31,8 @@ project Stream_Tools is
    type Library_Type_Kind is ("static","relocatable");
    type Boolean is ("True", "False");
 
-   Target : Target_type := external ("TARGET","native");
-
+   Target   : Target_type := external ("TARGET","native");
+   Old_Gcc  : Boolean     := external ("OLD_GCC","False");
    case Target is
       when "native" =>
          null;
@@ -45,6 +45,13 @@ project Stream_Tools is
    for Languages use ("Ada");
 
    for Source_Dirs use ("src");
+   case Old_Gcc is
+      when "True" =>
+         for Source_Dirs use project'Source_Dirs & ("src/runtimes");
+      when "False" =>
+         null;
+   end case;
+
    for Object_Dir use ".obj/" & Project'Target & "/" & project'Name & "/" & Library_Type;
    for Library_Dir use "lib/"& Project'Target;
    for Library_Name use "stream_tools";

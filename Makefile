@@ -3,13 +3,14 @@ _project=stream_tools
 -include Makefile.conf
 
 __prefix=$(shell dirname $(shell dirname $(shell which gnatls)))
-ifeq (${TARGET},"native")
-I_TARGET=
+ifeq ("${TARGET}","native")
+   I_TARGET:=
+   B_TARGET:=
 else
-ifdef TARGET
-B_TARGET=--target=${TARGET} -XTARGET=${TARGET}
-I_TARGET=--target=${TARGET} -XTARGET=${TARGET}  --prefix=${__prefix}/${TARGET}
-endif
+   ifdef TARGET
+      B_TARGET:=--target=${TARGET} -XTARGET=${TARGET}
+      I_TARGET:=--target=${TARGET} -XTARGET=${TARGET}  --prefix=${__prefix}/${TARGET}
+   endif
 endif
 
 all:
@@ -23,6 +24,7 @@ Makefile.conf:Makefile # IGNORE
 	echo "projectdir=${__prefix}/lib/gnat" >>${@}
 	echo "export PATH:=${CURDIR}/bin:${PATH}" >>${@}
 	echo "export TARGET:=${TARGET}" >>${@}
+	echo "export OLD_GCC:=$(shell tools/is_old_gcc.py)" >>${@}
 
 all:
 	${MAKE} compile
@@ -40,7 +42,7 @@ setup:
 compile:
 	gprbuild -p -j0 -P ${_project} ${B_TARGET} -XLIBRARY_TYPE=relocatable
 	gprbuild -p -j0 -P ${_project} ${B_TARGET} -XLIBRARY_TYPE=static
-	gprbuild -p -j0 -P version.gpr -XTARGET=native -XLIBRARY_TYPE=static
+	gprbuild -p -j0 -P ${_project}-version.gpr -XTARGET=native -XLIBRARY_TYPE=static
 	./bin/version
 
 generate-tests:
@@ -52,8 +54,10 @@ compile-test:
 generate_tests:
 	gnattest -P ${_project}
 
+.PHONY: test
 test:
-	bin/${_project}-test-main
+	gprbuild -p -j0 -P ${_project}-test.gpr
+	bin/stream_tools-tests-main
 
 dist:compile
 	git clone . $(_project)-$(shell bin/version)

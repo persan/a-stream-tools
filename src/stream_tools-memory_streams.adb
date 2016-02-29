@@ -29,7 +29,6 @@ with Ada.IO_Exceptions;
 with GNAT.Memory_Dump;
 with System.Memory;
 package body Stream_Tools.Memory_Streams is
-
    use Ada.Streams;
    overriding
    procedure Dump
@@ -124,12 +123,29 @@ package body Stream_Tools.Memory_Streams is
       First :=  This.Cursor;
       LLast := This.Cursor + Item'Length - 1;
       if LLast > This.Buffer_Length then
-         raise  Ada.IO_Exceptions.End_Error;
+         if This.Cursor > This.Buffer_Length then
+            raise  Ada.IO_Exceptions.End_Error;
+         elsif This.On_End_Of_File = Raise_End_Of_File_Exception  then
+            raise  Ada.IO_Exceptions.End_Error;
+         else
+            Item (Item'First .. Item'First + This.Buffer_Length - First - 1) :=
+              This.Buffer.As_Pointer.all (First .. This.Buffer_Length - 1);
+            Last := Item'First + This.Buffer_Length - First - 1;
+            This.Cursor := This.Buffer_Length + 1;
+         end if;
+      else
+         Item := This.Buffer.As_Pointer.all (First .. LLast);
+         This.Cursor := LLast + 1;
+         Last := Item'Last;
       end if;
-      Item := This.Buffer.As_Pointer.all (First .. LLast);
-      This.Cursor := LLast + 1;
-      Last := Item'Last;
    end Read;
+
+   procedure Set_End_Of_File_Stretegy
+     (This : in out Memory_Stream;
+      To   : End_Of_File_Stretegy := Raise_End_Of_File_Exception) is
+   begin
+      This.On_End_Of_File := To;
+   end Set_End_Of_File_Stretegy;
 
    -----------
    -- Write --
@@ -156,6 +172,7 @@ package body Stream_Tools.Memory_Streams is
    procedure Reset (This : in out Memory_Stream) is
    begin
       This.Cursor := This.Buffer.As_Pointer.all'First;
+      This.On_End_Of_File := Raise_End_Of_File_Exception;
    end Reset;
 
    procedure Read_Memory_Stream
@@ -283,4 +300,5 @@ package body Stream_Tools.Memory_Streams is
          To     => To,
          Flags  => Flags);
    end Send_Socket;
+
 end Stream_Tools.Memory_Streams;

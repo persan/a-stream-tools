@@ -1,3 +1,4 @@
+with "aunit";
 with "stream_tools.gpr";
 with "stream_tools-version.gpr";
 with "stream_tools-config.gpr";
@@ -5,22 +6,16 @@ project Stream_Tools.Test is
 
    for Languages use ("Ada");
 
-   for Main use ("stream_tools-tests-test_timed_streams.adb",
-                 "stream_tools-tests-main.adb",
-                 "stream_tools-demo_main.adb");
+   for Main use ("stream_tools-tests-main.adb" );
+--    for Main use project'main &  "stream_tools-tests-test_timed_streams.adb";
+--    for Main use project'main &  "stream_tools-demo_main.adb";
 
    for Source_Dirs use ("tests");
    for Target use Stream_Tools'Target;
 
-   for Object_Dir use ".obj/" & project'Target & "/" &  project'Name;
+   for Object_Dir use ".obj/" &  project'Name;
 
    for Exec_Dir use "bin";
-   case Target is
-      when "native" =>
-         null;
-      when others =>
-         for Exec_Dir use project'Exec_Dir & "/" & project'Target;
-   end case;
 
    package Builder        renames Stream_Tools.Builder;
    package Ide            renames Stream_Tools.Ide;

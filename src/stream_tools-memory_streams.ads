@@ -102,9 +102,10 @@ package Stream_Tools.Memory_Streams is
    type Memory_Stream is limited new Ada.Streams.Root_Stream_Type
      and Memory_Stream_Interface
    with private;
+
    procedure Read_Memory_Stream
      (This : not null access Ada.Streams.Root_Stream_Type'Class;
-      Item : out Memory_Stream);
+      Item : out Memory_Stream) with No_Return => True;
 
    procedure Write_Memory_Stream
      (This : not null access Ada.Streams.Root_Stream_Type'Class;
@@ -170,6 +171,22 @@ package Stream_Tools.Memory_Streams is
      (This   : in out Memory_Stream;
       Item   : Ada.Streams.Stream_Element_Array);
 
+   type End_Of_File_Stretegy is
+     (Raise_End_Of_File_Exception, Return_Remaing_Data_Or_Raise)
+     with
+       Default_Value => Raise_End_Of_File_Exception;
+
+   procedure Set_End_Of_File_Stretegy
+     (This : in out Memory_Stream;
+      To   : End_Of_File_Stretegy := Raise_End_Of_File_Exception);
+   --
+   --  Defines What should happen when trying to read past end of Buffer.
+   --  If Return_Remaing_Data_Or_Raise is set then the normal semantics of read
+   --  will change and read will return the remaining Stream_Elements in the
+   --  stream, note that this mode will not prevent End_Error if there is no
+   --  Stream_Elements to read. A reset of the stream will reset this walue to
+   --  Raise_End_Of_File_Exception.
+
    type Expand_Strategy is (As_Needed,
                             Multiply_By_Two,
                             Add_Initial_Size);
@@ -231,6 +248,7 @@ private
       Buffer        : Large_Buffer_Union;
       Buffer_Length : Streams.Stream_Element_Count  := 0;
       Cursor        : Streams.Stream_Element_Offset := 0;
+      On_End_Of_File :  End_Of_File_Stretegy := Raise_End_Of_File_Exception;
    end record;
 
    type Controler (Controled : not null access Dynamic_Memory_Stream)
@@ -239,9 +257,9 @@ private
    overriding procedure Initialize (This : in out Controler);
    overriding procedure Finalize   (This : in out Controler);
 
-   type Dynamic_Memory_Stream
-     (Initial_Size : Streams.Stream_Element_Offset;
-      Strategy     : Expand_Strategy) is new Memory_Stream with record
+   type Dynamic_Memory_Stream (Initial_Size : Streams.Stream_Element_Offset;
+                               Strategy     : Expand_Strategy)
+   is new Memory_Stream with record
       C            : Controler (Dynamic_Memory_Stream'Access);
    end record;
 

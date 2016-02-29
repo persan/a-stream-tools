@@ -1,3 +1,4 @@
+with Ada.Streams;
 -------------------------------------------------------------------------------
 --                                                                           --
 --  Copyright 2015 Per Sandberg <per.s.sandberg@bahnhof.se>                  --
@@ -24,5 +25,6 @@
 -------------------------------------------------------------------------------
 
 package Stream_Tools.Tests is
-   pragma Pure;
+   function Image (Item : Ada.Streams.Stream_Element) return String;
+   function Image (Item : Ada.Streams.Stream_Element_Array) return String;
 end Stream_Tools.Tests;

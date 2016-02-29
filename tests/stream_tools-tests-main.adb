@@ -22,58 +22,12 @@
 --  ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR    --
 --  OTHER DEALINGS IN THE SOFTWARE.                                          --
 -------------------------------------------------------------------------------
-
-with Stream_Tools.Bufferd_Streams;
-with GNAT.Traceback.Symbolic;
-with GNAT.Exception_Traces;
-with Ada.Text_IO; use Ada.Text_IO;
-with Ada.Streams; use Ada.Streams;
-with Ada.Assertions; use Ada.Assertions;
-with System; use System;
-
+with Stream_Tools.Tests.My_Suite;
+with AUnit.Run;
+with AUnit.Reporter.Text;
 procedure Stream_Tools.Tests.Main is
-   B : aliased Stream_Tools.Bufferd_Streams.Bufferd_Stream (6, System.Default_Priority);
-   I : Ada.Streams.Stream_Element_Array (1 .. 4) := (others => 0);
-
+   procedure Run is new AUnit.Run.Test_Runner (Stream_Tools.Tests.My_Suite.Suite);
+   Reporter : AUnit.Reporter.Text.Text_Reporter;
 begin
-   GNAT.Exception_Traces.Set_Trace_Decorator (GNAT.Traceback.Symbolic.Symbolic_Traceback'Access);
-   GNAT.Exception_Traces.Trace_On (GNAT.Exception_Traces.Every_Raise);
-   Short_Short_Integer'Write (B'Access, 1);
-   Short_Short_Integer'Write (B'Access, 2);
-   Short_Short_Integer'Write (B'Access, 3);
-   Short_Short_Integer'Write (B'Access, 4);
-   Short_Short_Integer'Write (B'Access, 5);
-   Short_Short_Integer'Write (B'Access, 6);
-
-   I := (others => 0);
-   Ada.Streams.Stream_Element_Array'Read (B'Access, I);
---     Assert (I = (1, 2, 3, 4), "");
-   Put_Line ("---------------------");
-   Short_Short_Integer'Write (B'Access, 7);
-   Short_Short_Integer'Write (B'Access, 8);
-
-   I := (others => 0);
-   Ada.Streams.Stream_Element_Array'Read (B'Access, I);
---     Assert (I = (5, 6, 7, 8), "");
-   Put_Line ("---------------------");
-
-   Short_Short_Integer'Write (B'Access, 1);
-   Short_Short_Integer'Write (B'Access, 2);
-   Short_Short_Integer'Write (B'Access, 3);
-   Short_Short_Integer'Write (B'Access, 4);
-   I := (others => 0);
-   Ada.Streams.Stream_Element_Array'Read (B'Access, I);
---     Assert (I = (1, 2, 3, 4), "");
-
-   Short_Short_Integer'Write (B'Access, 1);
-   Short_Short_Integer'Write (B'Access, 2);
-   Short_Short_Integer'Write (B'Access, 3);
-   Short_Short_Integer'Write (B'Access, 4);
-   I := (others => 0);
-   Ada.Streams.Stream_Element_Array'Read (B'Access, I);
-   Assert (I = (1, 2, 3, 4), "");
-   I := (1, 2, 3, 4);
-   --  Stream_Element_Array'Write (B'Access, Stream_Element_Array'(1, 2, 3, 4));
-   Stream_Element_Array'Write (B'Access, I);
-
+   Run (Reporter);
 end Stream_Tools.Tests.Main;

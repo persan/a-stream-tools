@@ -27,24 +27,16 @@ project Stream_Tools is
 
    Version := "1.0.4";
 
-   type Target_type is ("native","arm-eabi","arm-linux-gnueabihf");
    type Library_Type_Kind is ("static","relocatable");
    type Boolean is ("True", "False");
 
-   Target   : Target_type := external ("TARGET","native");
    Old_Gcc  : Boolean     := external ("OLD_GCC","False");
-   case Target is
-      when "native" =>
-         null;
-      when others =>
-         for Target use Target;
-   end case;
 
    Library_Type : Library_Type_Kind  := external ("LIBRARY_TYPE","static");
 
    for Languages use ("Ada");
 
-   for Source_Dirs use ("src");
+   for Source_Dirs use (".","src");
    case Old_Gcc is
       when "True" =>
          for Source_Dirs use project'Source_Dirs & ("src/runtimes");
@@ -52,8 +44,8 @@ project Stream_Tools is
          null;
    end case;
 
-   for Object_Dir use ".obj/" & Project'Target & "/" & project'Name & "/" & Library_Type;
-   for Library_Dir use "lib/"& Project'Target;
+   for Object_Dir use ".obj/" & project'Name & "/" & Library_Type;
+   for Library_Dir use "lib";
    for Library_Name use "stream_tools";
 
    for Library_Version use project'Shared_Library_Prefix &
@@ -61,18 +53,6 @@ project Stream_Tools is
                            project'Shared_Library_Suffix & "." & Version;
 
    for Library_Kind use Library_Type;
-   case Library_Type is
-      when "relocatable" =>
-         for Library_Interface use
-           ("stream_tools",
-            "stream_tools.bufferd_streams",
-            "stream_tools.timed_streams",
-            "stream_tools.timed_streams.input",
-            "stream_tools.timed_streams.output");
-
-      when "static" => null;
-   end case;
-
 
    package Builder is
       for Default_Switches ("Ada") use ("-s","-j0");
@@ -81,12 +61,6 @@ project Stream_Tools is
    package Ide is
       for Documentation_Dir use "doc";
       for Vcs_Kind use "Git";
-      case Target is
-        when "native" =>
-            null;
-         when others =>
-            for gnatlist use project'Target & "-gnatls";
-      end case;
    end Ide;
 
    package Make is
@@ -141,16 +115,16 @@ project Stream_Tools is
 
 
    package Gnattest is
-      for Harness_Dir use "tests/";
+      for Harness_Dir use project'Project_dir & "gnat-test/";
    end Gnattest;
 
    package Naming is
-      for  Implementation_Exceptions ("Makefile") use ("Makefile");
-      for Body_Suffix("Text") use ".txt";
+      for Implementation_Exceptions ("Makefile") use ("Makefile");
+      for Implementation_Suffix("Text") use ".txt";
       for Implementation_Exceptions("Text") use ("README.md");
-      for Body_Suffix ("Makefile") use ".mk";
-      for Body_Suffix ("python") use ".py";
-      for Spec_Suffix ("Project File") use ".gpr";
+      for Implementation_Suffix ("Makefile") use ".mk";
+      for Implementation_Suffix ("python") use ".py";
+      for Specification_Suffix ("Project File") use ".gpr";
    end Naming;
 
 end Stream_Tools;

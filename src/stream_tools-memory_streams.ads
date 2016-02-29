@@ -84,13 +84,14 @@ package Stream_Tools.Memory_Streams is
                    Pos  : Ada.Streams.Stream_Element_Offset) is abstract;
    --  Moves the stream position  forward or backward in the message stream.
    --  Sample:
-   --  move to the 10 element in the message.
+   --  move to the 10:th element in the message.
    --   Msg.Reset;
    --   Msg.Seek(10);
 
    function Pos (This : Memory_Stream_Interface)
                  return  Ada.Streams.Stream_Element_Offset is abstract;
    --  Returns the current cursor in the buffer
+
    function Eof (This : Memory_Stream_Interface) return Boolean is abstract;
 
    procedure Dump
@@ -143,7 +144,7 @@ package Stream_Tools.Memory_Streams is
                    Pos  : Ada.Streams.Stream_Element_Offset);
    --  Moves the stream position  forward or backward in the message stream.
    --  Sample:
-   --  move to the 10 element in the message.
+   --  move to the 10:th element in the message.
    --   Msg.Reset;
    --   Msg.Seek(10);
 

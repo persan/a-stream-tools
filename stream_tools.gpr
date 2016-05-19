@@ -25,18 +25,18 @@
 
 project Stream_Tools is
 
-   Version := "1.0.4";
+   Version := "1.1.0";
 
-   type Library_Type_Kind is ("static","relocatable");
+   type Library_Type_Kind is ("static", "relocatable");
    type Boolean is ("True", "False");
 
-   Old_Gcc  : Boolean     := external ("OLD_GCC","False");
+   Old_Gcc  : Boolean     := external ("OLD_GCC", "False");
 
-   Library_Type : Library_Type_Kind  := external ("LIBRARY_TYPE","static");
+   Library_Type : Library_Type_Kind  := external ("LIBRARY_TYPE", "static");
 
    for Languages use ("Ada");
 
-   for Source_Dirs use (".","src");
+   for Source_Dirs use (".", "src");
    case Old_Gcc is
       when "True" =>
          for Source_Dirs use project'Source_Dirs & ("src/runtimes");
@@ -49,13 +49,13 @@ project Stream_Tools is
    for Library_Name use "stream_tools";
 
    for Library_Version use project'Shared_Library_Prefix &
-                           project'Library_Name &
-                           project'Shared_Library_Suffix & "." & Version;
+     project'Library_Name &
+     project'Shared_Library_Suffix & "." & Version;
 
    for Library_Kind use Library_Type;
 
    package Builder is
-      for Default_Switches ("Ada") use ("-s","-j0");
+      for Default_Switches ("Ada") use ("-s", "-j0");
    end Builder;
 
    package Ide is
@@ -77,7 +77,7 @@ project Stream_Tools is
    package Compiler is
       for Default_Switches ("Ada") use ("-gnat12",
                                         "-gnateE", --   Generate extra information in exception messages
-                                        "-gnatf",--    Full errors. Verbose details, all undefined references
+                                        "-gnatf", --    Full errors. Verbose details, all undefined references
                                         "-gnatq",  --    Don't quit, try semantics, even if parse errors
                                         "-gnatQ",  --  Don't quit, write ali/tree file even if compile errors
                                         "-gnatwa", -- Turn on most Warnings
@@ -106,7 +106,7 @@ project Stream_Tools is
       for Driver ("makefile") use "";
       for Driver ("project file") use "";
       for Driver ("python") use "";
-      for Driver("Text") use "";
+      for Driver ("Text") use "";
    end Compiler;
 
    package Binder is
@@ -115,13 +115,13 @@ project Stream_Tools is
 
 
    package Gnattest is
-      for Harness_Dir use project'Project_dir & "gnat-test/";
+      for Harness_Dir use project'Project_Dir & "gnat-test/";
    end Gnattest;
 
    package Naming is
       for Implementation_Exceptions ("Makefile") use ("Makefile");
-      for Implementation_Suffix("Text") use ".txt";
-      for Implementation_Exceptions("Text") use ("README.md");
+      for Implementation_Suffix ("Text") use ".txt";
+      for Implementation_Exceptions ("Text") use ("README.md");
       for Implementation_Suffix ("Makefile") use ".mk";
       for Implementation_Suffix ("python") use ".py";
       for Specification_Suffix ("Project File") use ".gpr";

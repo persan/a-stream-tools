@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 --                                                                           --
---  Copyright 2015 Per Sandberg <per.s.sandberg@bahnhof.se>                  --
+--  Copyright 2016 Per Sandberg <per.s.sandberg@bahnhof.se>                  --
 --                                                                           --
 --  Permission is hereby granted, free of charge, to any person obtaining a  --
 --  copy of this software and associated documentation files                 --

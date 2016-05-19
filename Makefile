@@ -1,3 +1,4 @@
+#!/usr/bin/make gps -C 
 _project=stream_tools
 
 -include Makefile.conf
@@ -87,6 +88,8 @@ uninstall:
 	rm -rf ${INSTALL_DIR}${projectdir}/${_project}.gpr
 	rm -rf ${INSTALL_DIR}${libdir}
 
+gps:
+	gps -P ${_project}-test.gpr
 
 clean:
 	rm -rf .obj/* bin/* lib/* Makefile.conf *.tgz _* *~

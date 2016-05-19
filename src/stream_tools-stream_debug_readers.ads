@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 --                                                                           --
---  Copyright 2015 Per Sandberg <per.s.sandberg@bahnhof.se>                  --
+--  Copyright 2016 Per Sandberg <per.s.sandberg@bahnhof.se>                  --
 --                                                                           --
 --  Permission is hereby granted, free of charge, to any person obtaining a  --
 --  copy of this software and associated documentation files                 --
@@ -22,39 +22,43 @@
 --  ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR    --
 --  OTHER DEALINGS IN THE SOFTWARE.                                          --
 -------------------------------------------------------------------------------
-with GNAT.Bounded_Buffers;
+
 with Ada.Streams;
-with System;
-package Stream_Tools.Bufferd_Streams is
+package Stream_Tools.Stream_Debug_Readers is
 
-   --  This package provides a task-safe FIFO Buffer with a stream interface.
+   type Stream_Reader (S :  not null access Ada.Streams.Root_Stream_Type'Class) is
+     tagged limited private;
+   --  Reads from a stream and does a HEX-dump (using GNAT.Memory_Dump)
+   --  until the read operation return 0 Stream_Elements, then exist.
 
-   type Bufferd_Stream (Capacity : Positive;
-                        Ceiling : System.Priority) is
-     new Ada.Streams.Root_Stream_Type with private;
+   type Text_Stream_Reader (S :  not null access Ada.Streams.Root_Stream_Type'Class) is
+     tagged limited private;
+   --  Reads from a stream and does a text output (using GNAT.IO)
+   --  until the read operation return 0 Stream_Elements, then exist.
+   --  Not Printable will be displayed as '.'.
 
-   overriding procedure Read
-     (Stream : in out Bufferd_Stream;
-      Item   : out Ada.Streams.Stream_Element_Array;
-      Last   : out Ada.Streams.Stream_Element_Offset);
-   --  Read the full Stream_Element_Array, if the buffer does not contain enogh
-   --  Elements then wait until enogh space is avalible
-   --  Will raise constraint error if the buffer is to small to contain the
-   --  total amount of elements.
-
-   overriding procedure Write
-     (Stream : in out Bufferd_Stream;
-      Item   : Ada.Streams.Stream_Element_Array);
-   --  Writes the element array to the buffer
-   --  If ther is'nt enogh space then wait until there is place.
-   --  Will raise constraint error if the buffer is to small to contain the
-   --  total amount of elements.
+   Printable : constant array (Character) of Boolean
+     := (ASCII.LF | ASCII.CR | ASCII.HT | ASCII.VT | ' ' .. '~' => True,
+         others                                                 => False);
 
 private
-   package Stream_Element_Buffers is new GNAT.Bounded_Buffers (Ada.Streams.Stream_Element);
-   type Bufferd_Stream (Capacity : Positive;
-                        Ceiling : System.Priority)
-     is  new Ada.Streams.Root_Stream_Type with record
-      Buffer : Stream_Element_Buffers.Bounded_Buffer (Capacity, Ceiling);
+
+   task type Stream_Reader_Task
+     (S :  not null access Ada.Streams.Root_Stream_Type'Class) is
+   end Stream_Reader_Task;
+
+   type Stream_Reader (S :  not null access Ada.Streams.Root_Stream_Type'Class) is
+     tagged limited record
+      Reader :  Stream_Reader_Task (S);
    end record;
-end Stream_Tools.Bufferd_Streams;
+
+   task type Text_Stream_Reader_Task
+     (S :  not null access Ada.Streams.Root_Stream_Type'Class) is
+   end Text_Stream_Reader_Task;
+
+   type Text_Stream_Reader (S :  not null access Ada.Streams.Root_Stream_Type'Class) is
+     tagged limited record
+      Reader :  Text_Stream_Reader_Task (S);
+   end record;
+   procedure Display (Item : Ada.Streams.Stream_Element_Array);
+end Stream_Tools.Stream_Debug_Readers;

@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 --                                                                           --
---  Copyright 2015 Per Sandberg <per.s.sandberg@bahnhof.se>                  --
+--  Copyright 2016 Per Sandberg <per.s.sandberg@bahnhof.se>                  --
 --                                                                           --
 --  Permission is hereby granted, free of charge, to any person obtaining a  --
 --  copy of this software and associated documentation files                 --
@@ -25,7 +25,7 @@
 package Stream_Tools is
    pragma Pure;
 
-   Version      : constant String := "1.0.4";
-   Version_Date : constant String := "2016-02-29";
+   Version      : constant String := "1.1.0";
+   Version_Date : constant String := "2016-05-19";
 
 end Stream_Tools;

@@ -1,8 +1,7 @@
 
-with Stream_Tools.Bufferd_Streams;
+with Stream_Tools.Pipes;
 with Ada.Streams; use Ada.Streams;
 with Ada.Assertions; use Ada.Assertions;
-with System; use System;
 package body Stream_Tools.Tests.Bufferd_Stream_Tests is
 
    --------------------
@@ -31,7 +30,7 @@ package body Stream_Tools.Tests.Bufferd_Stream_Tests is
 
    procedure Test_Simple (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);
-      B : aliased Stream_Tools.Bufferd_Streams.Bufferd_Stream (6, System.Default_Priority);
+      B : aliased Stream_Tools.Pipes.Pipe (11);
       I : Ada.Streams.Stream_Element_Array (1 .. 4) := (others => 0);
 
    begin

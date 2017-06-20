@@ -1,4 +1,4 @@
-#!/usr/bin/make gps -C 
+#!/usr/bin/make gps -C
 _project=stream_tools
 
 -include Makefile.conf
@@ -67,7 +67,7 @@ dist:compile
 	rm -rf $(_project)-$(shell bin/version)
 
 tag-check:
-	if [[ ! -z  ` git status --porcelain` ]] ; then \
+	if [ ! -z  ` git status --porcelain` ] ; then \
 		echo "Folder is not clean" ;\
 		git status;\
 		exit 1;\
@@ -92,6 +92,6 @@ gps:
 	gps -P ${_project}-test.gpr
 
 clean:
-	rm -rf .obj/* bin/* lib/* Makefile.conf *.tgz _* *~
+	git clean -xdf
 
 .PHONY:

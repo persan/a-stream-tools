@@ -77,7 +77,7 @@ tag-check:
 tag:tag-check
 	git tag -f "$(shell bin/version --version)-$(shell bin/version --date)"
 	${MAKE} dist
-
+	git push --tag
 install:
 	gprinstall -f  -p -P ${_project} ${I_TARGET}
 

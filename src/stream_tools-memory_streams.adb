@@ -191,7 +191,7 @@ package body Stream_Tools.Memory_Streams is
       Ada.Streams.Stream_Element_Array'Write
         (This,
          Item.Buffer.As_Pointer.all
-           (Item.Buffer.As_Pointer.all'First .. Item.Cursor));
+           (Item.Buffer.As_Pointer.all'First .. Item.Cursor - 1));
    end Write_Memory_Stream;
 
    procedure Read_Dynamic_Memory_Stream

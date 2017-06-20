@@ -188,6 +188,14 @@ package Stream_Tools.Memory_Streams is
    --  Stream_Elements to read. A reset of the stream will reset this walue to
    --  Raise_End_Of_File_Exception.
 
+   procedure Send_Socket
+     (Socket : GNAT.Sockets.Socket_Type;
+      Item   : Memory_Stream;
+      Last   : out Ada.Streams.Stream_Element_Offset;
+      To     : access GNAT.Sockets.Sock_Addr_Type;
+      Flags  : GNAT.Sockets.Request_Flag_Type := GNAT.Sockets.No_Request_Flag);
+   --  Sends the whole contents of the stored Stream to a socket.
+
    type Expand_Strategy is (As_Needed,
                             Multiply_By_Two,
                             Add_Initial_Size);
@@ -218,14 +226,6 @@ package Stream_Tools.Memory_Streams is
    for Dynamic_Memory_Stream'Write use Write_Dynamic_Memory_Stream;
    for Dynamic_Memory_Stream'Input use Input_Dynamic_Memory_Stream;
    for Dynamic_Memory_Stream'Output use Output_Dynamic_Memory_Stream;
-
-   procedure Send_Socket
-     (Socket : GNAT.Sockets.Socket_Type;
-      Item   : Memory_Stream;
-      Last   : out Ada.Streams.Stream_Element_Offset;
-      To     : access GNAT.Sockets.Sock_Addr_Type;
-      Flags  : GNAT.Sockets.Request_Flag_Type := GNAT.Sockets.No_Request_Flag);
-   --  Sends the whole contents of the stored Stream to a socket.
 
 private
    subtype Large_Buffer is

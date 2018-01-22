@@ -25,7 +25,7 @@
 package Stream_Tools is
    pragma Pure;
 
-   Version      : constant String := "1.1.2";
+   Version      : constant String := "1.1.3";
    Version_Date : constant String := "2018-01-22";
 
 end Stream_Tools;

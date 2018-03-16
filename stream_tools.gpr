@@ -25,14 +25,14 @@
 
 project Stream_Tools is
 
-   Version := "1.1.2";
+   Version := "1.1.4";
 
    type Library_Type_Kind is ("static", "relocatable");
    type Boolean is ("True", "False");
 
    Old_Gcc  : Boolean     := external ("OLD_GCC", "False");
 
-   Library_Type : Library_Type_Kind  := external ("LIBRARY_TYPE", "static");
+   Library_Type : Library_Type_Kind  := external ("STREAM_TOOLS_LIBRARY_TYPE", "static");
 
    for Languages use ("Ada");
 
@@ -76,25 +76,28 @@ project Stream_Tools is
 
    package Compiler is
       for Default_Switches ("Ada") use ("-gnat12",
+                                        "-O2",
+                                        "-g",
+                                        "-fPIC",
                                         "-gnateE", --   Generate extra information in exception messages
                                         "-gnatf", --    Full errors. Verbose details, all undefined references
-                                        "-gnatq",  --    Don't quit, try semantics, even if parse errors
-                                        "-gnatQ",  --  Don't quit, write ali/tree file even if compile errors
-                                        "-gnatwa", -- Turn on most Warnings
-                                        "-gnaty3", --  check indentation
-                                        "-gnatya", --    check attribute casing
-                                        "-gnatyA", --    check array attribute indexes
-                                        "-gnatyb", --    check no blanks at end of lines
-                                        "-gnatyc", --    check comment format (two spaces)
-                                        "-gnatyd", --    check no DOS line terminators
-                                        "-gnatyf", --    check no form feeds/vertical tabs in source
-                                        "-gnatyg", --    check standard GNAT style rules
-                                        "-gnatyh", --    check no horizontal tabs in source
-                                        "-gnatyi", --    check if-then layout
-                                        "-gnatyk", --    check casing rules for keywords
-                                        "-gnatyl", --    check reference manual layout
-                                        "-gnatyL10", --  check max nest level < nn
-                                        "-gnatyn", --    check casing of package Standard identifiers
+                                        "-gnatq",  --   Don't quit, try semantics, even if parse errors
+                                        "-gnatQ",  --   Don't quit, write ali/tree file even if compile errors
+                                        "-gnatwa", --   Turn on most Warnings
+                                        "-gnaty3", --   check indentation
+                                        "-gnatya", --   check attribute casing
+                                        "-gnatyA", --   check array attribute indexes
+                                        "-gnatyb", --   check no blanks at end of lines
+                                        "-gnatyc", --   check comment format (two spaces)
+                                        "-gnatyd", --   check no DOS line terminators
+                                        "-gnatyf", --   check no form feeds/vertical tabs in source
+                                        "-gnatyg", --   check standard GNAT style rules
+                                        "-gnatyh", --   check no horizontal tabs in source
+                                        "-gnatyi", --   check if-then layout
+                                        "-gnatyk", --   check casing rules for keywords
+                                        "-gnatyl", --     check reference manual layout
+                                        "-gnatyL10", --   check max nest level < nn
+                                        "-gnatyn", --     check casing of package Standard identifiers
                                         "-gnatyM256", --  check line length <= nn characters
                                         "-gnatyO", --    check overriding indicators
                                         "-gnatyp", --    check pragma casing

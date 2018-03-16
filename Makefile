@@ -37,7 +37,7 @@ help:
 	echo ${datadir}
 	echo ${docdir}
 
-setup:
+setup: # IGNORE
 	# Do set up and code generation
 
 compile:
@@ -46,10 +46,10 @@ compile:
 	gprbuild -p -j0 -P ${_project}-version.gpr -XTARGET=native -XLIBRARY_TYPE=static
 	./bin/version
 
-generate-tests:
+generate-tests: # IGNORE
 	gnattest -P ${_project}
 
-compile-test:
+compile-test: # IGNORE
 	gprbuild -p -P ${_project}-test
 
 generate_tests:
@@ -66,7 +66,7 @@ dist:compile
 	tar -czf $(_project)-$(shell bin/version).tgz $(_project)-$(shell bin/version)
 	rm -rf $(_project)-$(shell bin/version)
 
-tag-check:
+tag-check: # IGNORE
 	if [ ! -z  ` git status --porcelain` ] ; then \
 		echo "Folder is not clean" ;\
 		git status;\
@@ -82,13 +82,13 @@ install:
 	gprinstall -f  -p -P ${_project} ${I_TARGET}
 
 
-uninstall:
+uninstall: # IGNORE
 	#gprinstall --uninstall -p -P ${_project}
 	rm -rf ${INSTALL_DIR}${includedir}
 	rm -rf ${INSTALL_DIR}${projectdir}/${_project}.gpr
 	rm -rf ${INSTALL_DIR}${libdir}
 
-gps:
+gps: # IGNORE
 	gps -P ${_project}-test.gpr
 
 clean:

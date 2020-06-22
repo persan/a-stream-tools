@@ -106,7 +106,7 @@ package Stream_Tools.Memory_Streams is
 
    procedure Read_Memory_Stream
      (This : not null access Ada.Streams.Root_Stream_Type'Class;
-      Item : out Memory_Stream) with No_Return => True;
+      Item : out Memory_Stream);
 
    procedure Write_Memory_Stream
      (This : not null access Ada.Streams.Root_Stream_Type'Class;

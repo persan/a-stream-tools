@@ -22,7 +22,6 @@ Provides a set of utilities for streams such as:
 `````
 
 Tested with
-
  GNATPro 21.0w-20200507
  GNATPro 19.0
  GNATPro 7.4

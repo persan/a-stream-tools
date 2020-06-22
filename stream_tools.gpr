@@ -25,7 +25,7 @@
 
 project Stream_Tools is
 
-   Version := "1.1.4";
+   Version := "1.1.5";
 
    type Library_Type_Kind is ("static", "relocatable");
    type Boolean is ("True", "False");

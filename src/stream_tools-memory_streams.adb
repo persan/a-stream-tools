@@ -35,15 +35,18 @@ package body Stream_Tools.Memory_Streams is
      (This        : Memory_Stream;
       Full_Buffer : Boolean := False) is
       Buffer : Large_Buffer_Access renames This.Buffer.As_Pointer;
+      use  GNAT.Memory_Dump;
    begin
       if Full_Buffer then
          GNAT.Memory_Dump.Dump
-           (Buffer.all (Buffer.all'First)'Address,
-            Integer (This.Buffer_Length));
+           (Addr   => Buffer.all (Buffer.all'First)'Address,
+            Count  => Natural (This.Buffer_Length),
+            Prefix => Offset);
       else
          GNAT.Memory_Dump.Dump
-           (Buffer.all (Buffer.all'First)'Address,
-            Integer (This.Cursor) - 1);
+           (Addr   => Buffer.all (Buffer.all'First)'Address,
+            Count  => Natural ((This.Cursor) - 1),
+            Prefix => Offset);
       end if;
    end Dump;
 

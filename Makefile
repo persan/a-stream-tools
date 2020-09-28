@@ -74,10 +74,12 @@ tag-check: # IGNORE
         fi
 	${MAKE} compile
 	version --tagcheck
+
 tag:tag-check
 	git tag -f "$(shell bin/version --version)-$(shell bin/version --date)"
 	${MAKE} dist
 	git push --tag
+
 install:
 	@if [ -n "$(shell gprinstall list | grep ${_project})" ]; then \
 		-@gprinstall --uninstall -P ${_project} 2>/dev/null 1>&2 ;\

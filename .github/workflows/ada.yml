@@ -18,7 +18,7 @@ jobs:
     - name: Set up GNAT toolchain
       run: >
         sudo apt-get update && 
-        echo sudo apt-get install gnat gprbuild libaunit17.2017-dev
+        sudo apt-get install gnat gprbuild libaunit17.2017-dev
 
     - name: Build
       run: make test

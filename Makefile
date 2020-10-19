@@ -57,8 +57,7 @@ generate_tests:
 
 .PHONY: test
 test:
-	gprbuild -p -j0 -P ${_project}-test.gpr
-	bin/stream_tools-tests-main
+	${MAKE} -C tests
 
 dist:compile
 	git clone . $(_project)-$(shell bin/version)

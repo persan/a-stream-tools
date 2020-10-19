@@ -18,4 +18,7 @@ package Stream_Tools.Tests.Memory_Stream_Tests is
    procedure Test_Read_Element_Array_3 (T : in out Test_Cases.Test_Case'Class);
    procedure Test_Size (T : in out Test_Cases.Test_Case'Class);
 
+   procedure Test_As_String (T : in out Test_Cases.Test_Case'Class);
+   procedure Test_Dump (T : in out Test_Cases.Test_Case'Class);
+
 end Stream_Tools.Tests.Memory_Stream_Tests;

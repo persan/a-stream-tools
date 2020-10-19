@@ -302,4 +302,31 @@ package body Stream_Tools.Memory_Streams is
          Flags  => Flags);
    end Send_Socket;
 
+   procedure Dump
+     (This        : Memory_Stream;
+      To          : not null access Ada.Streams.Root_Stream_Type'Class;
+      Full_Buffer : Boolean := False) is
+      Map : constant array (Stream_Element'(0) .. Stream_Element'(15)) of Character := "0123456789ABCDEF";
+      First_Char : Boolean := True;
+   begin
+      for C of This.Buffer.As_Pointer.all (This.Buffer.As_Pointer.all'First .. This.Cursor - 1) loop
+         if not First_Char then
+            Character'Write (To, ' ');
+         end if;
+         Character'Write (To, Map (C / 16));
+         Character'Write (To, Map (C mod 16));
+         First_Char := False;
+      end loop;
+   end Dump;
+
+   function As_Standard_String
+     (This : Memory_Stream;
+      Full_Buffer : Boolean := False) return String is
+   begin
+      if Full_Buffer then
+         return This.Buffer.As_String_Access.all (1 .. Positive (This.Get_Length));
+      else
+         return This.Buffer.As_String_Access.all (1 .. Positive (This.Pos));
+      end if;
+   end As_Standard_String;
 end Stream_Tools.Memory_Streams;

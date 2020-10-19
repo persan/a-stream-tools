@@ -35,6 +35,8 @@ package body Stream_Tools.Tests.Memory_Stream_Tests is
       Register_Routine (T, Test_Read_Element_Array_2'Access, "Test_Read_Element_Array_2");
       Register_Routine (T, Test_Read_Element_Array_3'Access, "Test_Read_Element_Array_3");
       Register_Routine (T, Test_Size'Access, "Test_Size");
+      Register_Routine (T, Test_As_String'Access, "Test_As_String");
+      Register_Routine (T, Test_Dump'Access, "Test_Dump");
 
    end Register_Tests;
 
@@ -162,6 +164,39 @@ package body Stream_Tools.Tests.Memory_Stream_Tests is
             Assert (True, "Wrong exception raised");
       end;
    end Test_Read_Element_Array_3;
+
+   procedure Test_Dump (T : in out Test_Cases.Test_Case'Class) is
+      pragma Unreferenced (T);
+      S : aliased Dynamic_Memory_Stream (16, As_Needed);
+      S2 : aliased Dynamic_Memory_Stream (16, As_Needed);
+      Expected : constant String := "30 31 32 33 34 35 36 37 38 39";
+   begin
+      String'Write (S'Access, "0123456789");
+      S.Dump (S2'Access);
+      declare
+         Actual : constant String := S2.As_Standard_String;
+      begin
+         Assert (Expected = Actual, "Content missmatch, Expected:'" & Expected & "', got :'" & Actual & "'.");
+      end;
+   end Test_Dump;
+
+   procedure Test_As_String (T : in out Test_Cases.Test_Case'Class) is
+      pragma Unreferenced (T);
+      S : aliased Dynamic_Memory_Stream (16, As_Needed);
+      Expected_16 : constant String := "1234567890ABCDEF";
+      Expected_4  : constant String := "abcd";
+      Expected_4b : constant String := "abcd567890ABCDEF";
+
+   begin
+      S.Reset;
+      String'Write (S'Access, Expected_16);
+      Assert (S.As_Standard_String = Expected_16, "Content missmatch, Expected:'" & Expected_16 & "', got :'" & S.As_Standard_String & "'.");
+      S.Reset;
+      String'Write (S'Access, Expected_4);
+      Assert (S.As_Standard_String = Expected_4, "Content missmatch, Expected:'" & Expected_4 & "', got :'" & S.As_Standard_String & "'.");
+      Assert (S.As_Standard_String (True) = Expected_4b, "Content missmatch, Expected:'" & Expected_4b & "', got :'" & S.As_Standard_String (True) & "'.");
+
+   end Test_As_String;
 
    procedure Test_Size (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);

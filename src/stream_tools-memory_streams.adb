@@ -302,20 +302,30 @@ package body Stream_Tools.Memory_Streams is
          Flags  => Flags);
    end Send_Socket;
 
+   function Image (Item : Ada.Streams.Stream_Element; Full : Boolean := False) return String;
+   function Image (Item : Ada.Streams.Stream_Element; Full : Boolean := False) return String is
+      Map : constant array (Stream_Element'(0) .. Stream_Element'(15)) of Character := "0123456789ABCDEF";
+      Val : constant String := Map (Item / 16) & Map (Item mod 16);
+   begin
+      if Full then
+         return "16#" & Val & "#";
+      else
+         return Val;
+      end if;
+   end Image;
+
    procedure Dump
      (This        : Memory_Stream;
       To          : not null access Ada.Streams.Root_Stream_Type'Class;
       Full_Buffer : Boolean := False) is
-      Map : constant array (Stream_Element'(0) .. Stream_Element'(15)) of Character := "0123456789ABCDEF";
       First_Char : Boolean := True;
    begin
       for C of This.Buffer.As_Pointer.all (This.Buffer.As_Pointer.all'First .. This.Cursor - 1) loop
          if not First_Char then
             Character'Write (To, ' ');
+            First_Char := False;
          end if;
-         Character'Write (To, Map (C / 16));
-         Character'Write (To, Map (C mod 16));
-         First_Char := False;
+         String'Write (To, Image (C));
       end loop;
    end Dump;
 
@@ -329,4 +339,28 @@ package body Stream_Tools.Memory_Streams is
          return This.Buffer.As_String_Access.all (1 .. Positive (This.Pos));
       end if;
    end As_Standard_String;
+
+   procedure As_Source
+     (This        : Memory_Stream;
+      To          : not null access Ada.Streams.Root_Stream_Type'Class;
+      Full_Buffer : Boolean := False)   is
+      Data : Stream_Element_Array renames This.Buffer.As_Pointer.all (0 .. (if Full_Buffer then This.Get_Length - 1 else This.Pos - 1));
+      Pos : Natural := 0;
+   begin
+      String'Write (To, "(");
+      for C of Data loop
+         if Pos > 0 then
+            Character'Write (To, ',');
+            if Pos mod 16 = 0 then
+               Character'Write (To, ASCII.LF);
+            else
+               Character'Write (To, ' ');
+            end if;
+         end if;
+         Pos := Pos + 1;
+         String'Write (To, Image (C, True));
+      end loop;
+      String'Write (To, ");");
+   end As_Source;
+
 end Stream_Tools.Memory_Streams;

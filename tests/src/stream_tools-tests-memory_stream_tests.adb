@@ -36,8 +36,7 @@ package body Stream_Tools.Tests.Memory_Stream_Tests is
       Register_Routine (T, Test_Read_Element_Array_3'Access, "Test_Read_Element_Array_3");
       Register_Routine (T, Test_Size'Access, "Test_Size");
       Register_Routine (T, Test_As_String'Access, "Test_As_String");
-      Register_Routine (T, Test_Dump'Access, "Test_Dump");
-
+      Register_Routine (T, Test_As_Source'Access, "Test_As_Source");
    end Register_Tests;
 
    ----------
@@ -195,8 +194,25 @@ package body Stream_Tools.Tests.Memory_Stream_Tests is
       String'Write (S'Access, Expected_4);
       Assert (S.As_Standard_String = Expected_4, "Content missmatch, Expected:'" & Expected_4 & "', got :'" & S.As_Standard_String & "'.");
       Assert (S.As_Standard_String (True) = Expected_4b, "Content missmatch, Expected:'" & Expected_4b & "', got :'" & S.As_Standard_String (True) & "'.");
-
    end Test_As_String;
+
+   procedure Test_As_Source (T : in out Test_Cases.Test_Case'Class) is
+      pragma Unreferenced (T);
+      S   : aliased Dynamic_Memory_Stream (64, As_Needed);
+      Tgt : aliased Dynamic_Memory_Stream (64, As_Needed);
+      Expected : constant String := "(16#20#, 16#22#, 16#23#, 16#FF#);";
+   begin
+      Stream_Element'Write (S'Access, 16#20#);
+      Stream_Element'Write (S'Access, 16#22#);
+      Stream_Element'Write (S'Access, 16#23#);
+      Stream_Element'Write (S'Access, 16#FF#);
+         S.As_Source (Tgt'Access);
+      declare
+         Actual : constant String :=  Tgt.As_Standard_String;
+      begin
+         Assert (Actual = Expected, "Content missmatch, Expected:'" & Expected & "', got :'" & Actual & "'.");
+      end;
+   end;
 
    procedure Test_Size (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);

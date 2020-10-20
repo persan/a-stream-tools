@@ -175,6 +175,13 @@ package Stream_Tools.Memory_Streams is
       Full_Buffer : Boolean := False) return String;
    --  returns the content of the buffer as a string.
 
+   procedure As_Source
+     (This        : Memory_Stream;
+      To          : not null access Ada.Streams.Root_Stream_Type'Class;
+      Full_Buffer : Boolean := False);
+   --  Prinnts the content of the buffer as
+   --  source code for a Stream_Element_Array.
+
    overriding procedure Read
      (This   : in out Memory_Stream;
       Item   : out Ada.Streams.Stream_Element_Array;

@@ -212,7 +212,7 @@ package body Stream_Tools.Tests.Memory_Stream_Tests is
       begin
          Assert (Actual = Expected, "Content missmatch, Expected:'" & Expected & "', got :'" & Actual & "'.");
       end;
-   end;
+   end Test_As_Source;
 
    procedure Test_Size (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);

@@ -29,6 +29,7 @@ project Stream_Tools.Version is
    for Exec_Dir use "bin";
    for Source_Dirs use ("tools");
    for Main use ("version.adb");
+   package Builder renames Stream_Tools.Builder;
    package Compiler is
       for default_Switches("Ada") use
         stream_tools.Compiler'default_Switches("Ada") &

@@ -171,7 +171,7 @@ package Stream_Tools.Memory_Streams is
    --  to the cursor as a hex values.
 
    function As_Standard_String
-     (This : Memory_Stream;
+     (This        : Memory_Stream;
       Full_Buffer : Boolean := False) return String;
    --  returns the content of the buffer as a string.
 
@@ -179,7 +179,7 @@ package Stream_Tools.Memory_Streams is
      (This        : Memory_Stream;
       To          : not null access Ada.Streams.Root_Stream_Type'Class;
       Full_Buffer : Boolean := False);
-   --  Prinnts the content of the buffer as
+   --  Prints the content of the buffer as
    --  source code for a Stream_Element_Array.
 
    overriding procedure Read
@@ -248,23 +248,22 @@ package Stream_Tools.Memory_Streams is
 
 private
    subtype Large_Buffer is
-     Streams.Stream_Element_Array (0 .. Streams.Stream_Element_Offset'Last);
-   type Large_Buffer_Access is access Large_Buffer with
-     Storage_Size => 0;
+     Streams.Stream_Element_Array
+       (Streams.Stream_Element_Offset'First .. Streams.Stream_Element_Offset'Last);
+   type Large_Buffer_Access is access Large_Buffer with Storage_Size => 0;
 
    subtype Large_String is
-     String (1 .. Positive'Last);
-   type Large_String_Access is access Large_String with
-     Storage_Size => 0;
+     String (Positive'First .. Positive'Last);
+   type Large_String_Access is access Large_String with Storage_Size => 0;
 
    type Large_Buffer_Union (Part  : Integer := 0) is record
       case Part is
       when 0 =>
-         As_Address : System.Address;
+         As_Address       : System.Address;
       when 1 =>
-         As_Pointer : Large_Buffer_Access;
+         As_Large_Buffer_Access  : Large_Buffer_Access;
       when others =>
-         As_String_Access : Large_String_Access;
+         As_Large_String_Access  : Large_String_Access;
       end case;
    end record with
      Unchecked_Union => True;
@@ -272,9 +271,9 @@ private
    type Memory_Stream is limited new Streams.Root_Stream_Type
      and Memory_Stream_Interface
    with record
-      Buffer        : Large_Buffer_Union;
-      Buffer_Length : Streams.Stream_Element_Count  := 0;
-      Cursor        : Streams.Stream_Element_Offset := 0;
+      Buffer         : Large_Buffer_Union;
+      Buffer_Length  : Streams.Stream_Element_Count  := 0;
+      Cursor         : Streams.Stream_Element_Offset := 0;
       On_End_Of_File :  End_Of_File_Stretegy := Raise_End_Of_File_Exception;
    end record;
 

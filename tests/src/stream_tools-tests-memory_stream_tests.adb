@@ -9,16 +9,19 @@ package body Stream_Tools.Tests.Memory_Stream_Tests is
    function Image (Item : Stream_Element_Array) return String;
 
    function Image (Item : Stream_Element_Array) return String is
-      type Nible is range 0 .. 15 with Size => 4;
-      type Nible_Array is array (1 .. Item'Length * 2) of Nible with Pack => True;
-      Src : Nible_Array with Address => Item'Address;
-      Map : constant array (Nible) of Character := "0123456789ABCDEF";
-      Cursor : Natural := 1;
+      type Nible is range 0 .. 15 with
+         Size => 4;
+      type Nible_Array is array (1 .. Item'Length * 2) of Nible with
+         Pack => True;
+      Src : Nible_Array with
+         Address => Item'Address;
+      Map    : constant array (Nible) of Character := "0123456789ABCDEF";
+      Cursor : Natural                             := 1;
    begin
       return Ret : String (1 .. Item'Length * 2) do
          for I of Src loop
             Ret (Cursor) := Map (I);
-            Cursor := Cursor + 1;
+            Cursor       := Cursor + 1;
          end loop;
       end return;
    end Image;
@@ -55,7 +58,7 @@ package body Stream_Tools.Tests.Memory_Stream_Tests is
 
    procedure Test_Simple (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);
-      S : aliased Stream_Tools.Memory_Streams.Memory_Stream;
+      S      : aliased Stream_Tools.Memory_Streams.Memory_Stream;
       Buffer : aliased Ada.Streams.Stream_Element_Array (1 .. 4);
       Temp   : Integer := 0;
    begin
@@ -73,7 +76,7 @@ package body Stream_Tools.Tests.Memory_Stream_Tests is
 
    procedure Test_Read_Past_Eof_Raise (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);
-      S : aliased Stream_Tools.Memory_Streams.Memory_Stream;
+      S      : aliased Stream_Tools.Memory_Streams.Memory_Stream;
       Buffer : aliased Ada.Streams.Stream_Element_Array (1 .. 4);
       Temp   : Integer := 0;
    begin
@@ -95,8 +98,8 @@ package body Stream_Tools.Tests.Memory_Stream_Tests is
 
    procedure Test_Read_Element_Array_1 (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);
-      S : aliased Stream_Tools.Memory_Streams.Memory_Stream;
-      Buffer : aliased Ada.Streams.Stream_Element_Array (1 .. 4);
+      S          : aliased Stream_Tools.Memory_Streams.Memory_Stream;
+      Buffer     : aliased Ada.Streams.Stream_Element_Array (1 .. 4);
       Out_Buffer : aliased constant Ada.Streams.Stream_Element_Array (1 .. 4) := (1, 2, 3, 4);
    begin
       S.Set_Address (Buffer'Address);
@@ -115,8 +118,8 @@ package body Stream_Tools.Tests.Memory_Stream_Tests is
 
    procedure Test_Read_Element_Array_2 (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);
-      S : aliased Stream_Tools.Memory_Streams.Memory_Stream;
-      Buffer : aliased Ada.Streams.Stream_Element_Array (1 .. 4) := (0, 1, 2, 3);
+      S          : aliased Stream_Tools.Memory_Streams.Memory_Stream;
+      Buffer     : aliased Ada.Streams.Stream_Element_Array (1 .. 4) := (0, 1, 2, 3);
       Out_Buffer : aliased Ada.Streams.Stream_Element_Array (1 .. 3);
       Last       : Ada.Streams.Stream_Element_Offset;
    begin
@@ -137,9 +140,9 @@ package body Stream_Tools.Tests.Memory_Stream_Tests is
 
    procedure Test_Read_Element_Array_3 (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);
-      S : aliased Memory_Stream;
-      Buffer : aliased Stream_Element_Array (1 .. 4) := (0, 1, 2, 3);
-      Out_Buffer : aliased Ada.Streams.Stream_Element_Array (1 .. 3);
+      S          : aliased Memory_Stream;
+      Buffer     : aliased Stream_Element_Array (1 .. 4)             := (0, 1, 2, 3);
+      Out_Buffer : aliased Ada.Streams.Stream_Element_Array (1 .. 3) := (others => 16#CA#);
       Last       : Ada.Streams.Stream_Element_Offset;
    begin
       S.Set_Address (Buffer'Address);
@@ -148,11 +151,12 @@ package body Stream_Tools.Tests.Memory_Stream_Tests is
       S.Read (Out_Buffer, Last);
       Assert (Out_Buffer = (0, 1, 2), "Wrong Data");
       S.Set_End_Of_File_Stretegy (To => Return_Remaing_Data_Or_Raise);
-      Out_Buffer := (others =>  16#FF#);
+      Out_Buffer := (others => 16#FF#);
       S.Read (Out_Buffer, Last);
-      Assert (Out_Buffer = (3, 16#FF#, 16#FF#), "Wrong Data got [" &
-                Image (Out_Buffer) & "] expected ["  & Image ((3, 16#FF#, 16#FF#)) & "]");
-      Assert (Last = Out_Buffer'First, "To mutch data read");
+      Assert
+        (Out_Buffer = (3, 16#FF#, 16#FF#),
+         "Wrong Data got [" & Image (Out_Buffer) & "] expected [" & Image ((3, 16#FF#, 16#FF#)) & "]");
+      Assert (Last = Out_Buffer'Last, "To mutch data read");
       begin
          S.Read (Out_Buffer, Last);
          Assert (True, "Could Read from empty buffer");
@@ -166,8 +170,8 @@ package body Stream_Tools.Tests.Memory_Stream_Tests is
 
    procedure Test_Dump (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);
-      S : aliased Dynamic_Memory_Stream (16, As_Needed);
-      S2 : aliased Dynamic_Memory_Stream (16, As_Needed);
+      S        : aliased Dynamic_Memory_Stream (16, As_Needed);
+      S2       : aliased Dynamic_Memory_Stream (16, As_Needed);
       Expected : constant String := "30 31 32 33 34 35 36 37 38 39";
    begin
       String'Write (S'Access, "0123456789");
@@ -181,7 +185,7 @@ package body Stream_Tools.Tests.Memory_Stream_Tests is
 
    procedure Test_As_String (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);
-      S : aliased Dynamic_Memory_Stream (16, As_Needed);
+      S           : aliased Dynamic_Memory_Stream (16, As_Needed);
       Expected_16 : constant String := "1234567890ABCDEF";
       Expected_4  : constant String := "abcd";
       Expected_4b : constant String := "abcd567890ABCDEF";
@@ -189,26 +193,34 @@ package body Stream_Tools.Tests.Memory_Stream_Tests is
    begin
       S.Reset;
       String'Write (S'Access, Expected_16);
-      Assert (S.As_Standard_String = Expected_16, "Content missmatch, Expected:'" & Expected_16 & "', got :'" & S.As_Standard_String & "'.");
+      Assert
+        (S.As_Standard_String = Expected_16,
+         "Content missmatch, Expected:'" & Expected_16 & "', got :'" & S.As_Standard_String & "'.");
       S.Reset;
       String'Write (S'Access, Expected_4);
-      Assert (S.As_Standard_String = Expected_4, "Content missmatch, Expected:'" & Expected_4 & "', got :'" & S.As_Standard_String & "'.");
-      Assert (S.As_Standard_String (True) = Expected_4b, "Content missmatch, Expected:'" & Expected_4b & "', got :'" & S.As_Standard_String (True) & "'.");
+      Assert
+        (S.As_Standard_String = Expected_4,
+         "Content missmatch, Expected:'" & Expected_4 & "', got :'" & S.As_Standard_String & "'.");
+      Assert
+        (S.As_Standard_String (True) = Expected_4b,
+         "Content missmatch, Expected:'" & Expected_4b & "', got :'" & S.As_Standard_String (True) & "'.");
    end Test_As_String;
 
    procedure Test_As_Source (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);
-      S   : aliased Dynamic_Memory_Stream (64, As_Needed);
-      Tgt : aliased Dynamic_Memory_Stream (64, As_Needed);
+      S        : aliased Dynamic_Memory_Stream (64, As_Needed);
+      Tgt      : aliased Dynamic_Memory_Stream (64, As_Needed);
       Expected : constant String := "(16#20#, 16#22#, 16#23#, 16#FF#);";
    begin
+      S.Reset;
+      Tgt.Reset;
       Stream_Element'Write (S'Access, 16#20#);
       Stream_Element'Write (S'Access, 16#22#);
       Stream_Element'Write (S'Access, 16#23#);
       Stream_Element'Write (S'Access, 16#FF#);
-         S.As_Source (Tgt'Access);
+      S.As_Source (Tgt'Access);
       declare
-         Actual : constant String :=  Tgt.As_Standard_String;
+         Actual : constant String := Tgt.As_Standard_String;
       begin
          Assert (Actual = Expected, "Content missmatch, Expected:'" & Expected & "', got :'" & Actual & "'.");
       end;
@@ -216,11 +228,11 @@ package body Stream_Tools.Tests.Memory_Stream_Tests is
 
    procedure Test_Size (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);
-      S1 : aliased Memory_Stream;
-      S2 : aliased Memory_Stream;
-      Buffer1 : aliased Stream_Element_Array (1 .. 10) := (others => 16#CA#);
-      Buffer2 : aliased Stream_Element_Array (1 .. 10) := (others => 16#FF#);
-      Expected  : constant Stream_Element_Array := (1 => 16#44#, 2 => 16#33#, 3 => 16#22#, 4 => 16#11#, 5 .. 10 => 16#FF#);
+      S1       : aliased Memory_Stream;
+      S2       : aliased Memory_Stream;
+      Buffer1  : aliased Stream_Element_Array (1 .. 10) := (others => 16#CA#);
+      Buffer2  : aliased Stream_Element_Array (1 .. 10) := (others => 16#FF#);
+      Expected : constant Stream_Element_Array := (1 => 16#44#, 2 => 16#33#, 3 => 16#22#, 4 => 16#11#, 5 .. 10 => 16#FF#);
    begin
       S1.Set_Address (Buffer1'Address);
       S1.Set_Length (Buffer1'Length);

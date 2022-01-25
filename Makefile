@@ -3,56 +3,26 @@ _project=stream_tools
 
 -include Makefile.conf
 
-__prefix=$(shell dirname $(shell dirname $(shell which gnatls)))
-ifeq ("${TARGET}","native")
-   I_TARGET:=
-   B_TARGET:=
-else
-   ifdef TARGET
-      B_TARGET:=--target=${TARGET} -XTARGET=${TARGET}
-      I_TARGET:=--target=${TARGET} -XTARGET=${TARGET}  --prefix=${__prefix}/${TARGET}
-   endif
-endif
+PREFIX?=$(shell dirname $(shell dirname $(shell which gnatls)))
 
-all:
-Makefile.conf:Makefile # IGNORE
-	echo "prefix=${__prefix}" >${@}
-	echo "includedir=${__prefix}/include/${_project}" >>${@}
-	echo "bindir=${__prefix}/bin" >>${@}
-	echo "libdir=${__prefix}/lib/${_project}" >>${@}
-	echo "datadir=${__prefix}/share/${_project}" >>${@}
-	echo "docdir=${__prefix}/share/doc/${_project}" >>${@}
-	echo "projectdir=${__prefix}/lib/gnat" >>${@}
-	echo "export TARGET:=${TARGET}" >>${@}
-	echo "export OLD_GCC:=$(shell tools/is_old_gcc.py)" >>${@}
 
-all:
-	${MAKE} compile
+all:compile
+
+Makefile.conf:Makefile
+	echo "GPRINSTALL=$(shell which gprinstall)" >${@}
+
 
 help:
 	echo Help text
-	echo ${PATH}
-	echo ${bindir}
-	echo ${datadir}
-	echo ${docdir}
 
 setup: # IGNORE
 	# Do set up and code generation
 
 compile:
-	gprbuild -p -j0 -P ${_project} ${B_TARGET} -XLIBRARY_TYPE=relocatable
-	gprbuild -p -j0 -P ${_project} ${B_TARGET} -XLIBRARY_TYPE=static
-	gprbuild -p -j0 -P ${_project}-version.gpr -XTARGET=native -XLIBRARY_TYPE=static
-	./bin/version
+	gprbuild -p -j0 -P ${_project} -XLIBRARY_TYPE=relocatable
+	gprbuild -p -j0 -P ${_project} -XLIBRARY_TYPE=static
+	gprbuild -p -j0 -P ${_project}-version.gpr -XLIBRARY_TYPE=static
 
-generate-tests: # IGNORE
-	gnattest -P ${_project}
-
-compile-test: # IGNORE
-	gprbuild -p -P ${_project}-test
-
-generate_tests:
-	gnattest -P ${_project}
 
 .PHONY: test
 test:
@@ -78,21 +48,15 @@ tag:tag-check
 	${MAKE} dist
 	git push --tag
 
-install:
-	@if [ -n "$(shell gprinstall --list | grep ${_project})" ]; then \
-		gprinstall --uninstall -P ${_project} 2>/dev/null 1>&2 ;\
-	fi
-	gprinstall -f  -p -P ${_project} ${I_TARGET}
+install:uninstall
+	${GPRINSTALL} --prefix=${PREFIX}  -p -P ${_project}
 
 
 uninstall: # IGNORE
-	#gprinstall --uninstall -p -P ${_project}
-	rm -rf ${INSTALL_DIR}${includedir}
-	rm -rf ${INSTALL_DIR}${projectdir}/${_project}.gpr
-	rm -rf ${INSTALL_DIR}${libdir}
+	-@if [ -n "$(shell gprinstall --prefix=${PREFIX} --list | grep ${_project})" ]; then \
+		${GPRINSTALL} --prefix=${PREFIX} --uninstall -P ${_project} 2>/dev/null 1>&2 ;\
+	fi
 
-gps: # IGNORE
-	gps -P ${_project}-test.gpr
 
 clean:
 	git clean -xdf

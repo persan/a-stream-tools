@@ -23,7 +23,6 @@ Makefile.conf:Makefile # IGNORE
 	echo "datadir=${__prefix}/share/${_project}" >>${@}
 	echo "docdir=${__prefix}/share/doc/${_project}" >>${@}
 	echo "projectdir=${__prefix}/lib/gnat" >>${@}
-	echo "export PATH:=${CURDIR}/bin:${PATH}" >>${@}
 	echo "export TARGET:=${TARGET}" >>${@}
 	echo "export OLD_GCC:=$(shell tools/is_old_gcc.py)" >>${@}
 
@@ -72,7 +71,7 @@ tag-check: # IGNORE
 		exit 1;\
         fi
 	${MAKE} compile
-	version --tagcheck
+	./bin/version --tagcheck
 
 tag:tag-check
 	git tag -f "$(shell bin/version --version)-$(shell bin/version --date)"

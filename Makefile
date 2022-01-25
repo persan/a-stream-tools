@@ -79,11 +79,10 @@ tag:tag-check
 	git push --tag
 
 install:
-	@if [ -n "$(shell gprinstall list | grep ${_project})" ]; then \
-		-@gprinstall --uninstall -P ${_project} 2>/dev/null 1>&2 ;\
+	@if [ -n "$(shell gprinstall --list | grep ${_project})" ]; then \
+		gprinstall --uninstall -P ${_project} 2>/dev/null 1>&2 ;\
 	fi
-		
-	gprinstall -f  -p -P ${_project} ${I_TARGET} 
+	gprinstall -f  -p -P ${_project} ${I_TARGET}
 
 
 uninstall: # IGNORE

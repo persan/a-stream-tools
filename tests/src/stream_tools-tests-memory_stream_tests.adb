@@ -156,7 +156,7 @@ package body Stream_Tools.Tests.Memory_Stream_Tests is
       Assert
         (Out_Buffer = (3, 16#FF#, 16#FF#),
          "Wrong Data got [" & Image (Out_Buffer) & "] expected [" & Image ((3, 16#FF#, 16#FF#)) & "]");
-      Assert (Last = Out_Buffer'Last, "To mutch data read");
+      Assert (Last = Out_Buffer'First, "Wrong amount read, expexted last to be :  1 Got : " & Last'Img);
       begin
          S.Read (Out_Buffer, Last);
          Assert (True, "Could Read from empty buffer");

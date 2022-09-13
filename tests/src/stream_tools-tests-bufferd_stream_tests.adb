@@ -2,12 +2,12 @@
 with Stream_Tools.Pipes;
 with Ada.Streams; use Ada.Streams;
 with Ada.Assertions; use Ada.Assertions;
+with GNAT.Source_Info;
 package body Stream_Tools.Tests.Bufferd_Stream_Tests is
 
    --------------------
    -- Register_Tests --
    --------------------
-
    overriding procedure Register_Tests (T : in out Bufferd_Stream_Test) is
       use AUnit.Test_Cases.Registration;
    begin
@@ -18,10 +18,11 @@ package body Stream_Tools.Tests.Bufferd_Stream_Tests is
    -- Name --
    ----------
 
+   Test_Name : constant String := GNAT.Source_Info.Enclosing_Entity;
    overriding function Name (T : Bufferd_Stream_Test) return Message_String is
       pragma Unreferenced (T);
    begin
-      return Format ("Stream_Tools.Tests.Bufferd_Stream_Tests");
+      return Format (Test_Name);
    end Name;
 
    ---------------------

@@ -249,7 +249,7 @@ package Stream_Tools.Memory_Streams is
 private
    subtype Large_Buffer is
      Streams.Stream_Element_Array
-       (Streams.Stream_Element_Offset'First .. Streams.Stream_Element_Offset'Last);
+       (0 .. Streams.Stream_Element_Offset'Last);
    type Large_Buffer_Access is access Large_Buffer with Storage_Size => 0;
 
    subtype Large_String is

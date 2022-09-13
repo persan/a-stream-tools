@@ -17,12 +17,16 @@ package body Stream_Tools.Tests is
    -----------
    function Image (Item : Ada.Streams.Stream_Element_Array) return String is
       Ret : Unbounded_String;
+      First : Boolean := True;
    begin
       for I of Item loop
+         if not First then
+            Append (Ret, " ");
+         end if;
+         First := False;
          Append (Ret, Image (I));
-         Append (Ret, " ");
       end loop;
-      return Slice (Ret, 1, Length (Ret) - 1);
+      return To_String (Ret);
    end Image;
 
 end Stream_Tools.Tests;

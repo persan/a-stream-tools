@@ -2,7 +2,7 @@ with Stream_Tools.Tests.BUG20220913.Eth.Messages;
 with Stream_Tools.Tests.BUG20220913.Eth.Messages.Command_Jak;
 with GNAT.Source_Info;
 
-package body Stream_Tools.Tests.BUG20220913 is
+package body Stream_Tools.Tests.BUG20220913.Test is
 
    procedure Crash_GNAT23 (T : in out Test_Cases.Test_Case'Class);
 
@@ -63,4 +63,4 @@ package body Stream_Tools.Tests.BUG20220913 is
       return Format (Test_Name);
    end Name;
 
-end Stream_Tools.Tests.BUG20220913;
+end Stream_Tools.Tests.BUG20220913.Test;

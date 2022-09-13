@@ -1,7 +1,7 @@
 with AUnit.Test_Suites;
 with AUnit.Reporter.Text;
 with AUnit.Run;
-procedure Stream_Tools.Tests.BUG20220913.main is
+procedure Stream_Tools.Tests.BUG20220913.Test.main is
    use AUnit.Test_Suites;
 
    function Suite return AUnit.Test_Suites.Access_Test_Suite;
@@ -18,4 +18,4 @@ procedure Stream_Tools.Tests.BUG20220913.main is
    Reporter : AUnit.Reporter.Text.Text_Reporter;
 begin
    Run (Reporter);
-end Stream_Tools.Tests.BUG20220913.Main;
+end Stream_Tools.Tests.BUG20220913.Main.Test;

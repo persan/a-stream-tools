@@ -9,6 +9,7 @@ package body Stream_Tools.Tests.Generic_Classwide_Ring is
    Unit_Name : constant String := GNAT.Source_Info.Enclosing_Entity;
 
    overriding function Name (T : Test_Case) return Message_String is
+      pragma Unreferenced (T);
    begin
       return Format (Unit_Name);
    end Name;

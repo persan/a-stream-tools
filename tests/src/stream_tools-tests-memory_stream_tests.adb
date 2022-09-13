@@ -121,13 +121,13 @@ package body Stream_Tools.Tests.Memory_Stream_Tests is
       S          : aliased Stream_Tools.Memory_Streams.Memory_Stream;
       Buffer     : aliased Ada.Streams.Stream_Element_Array (1 .. 4) := (0, 1, 2, 3);
       Out_Buffer : aliased Ada.Streams.Stream_Element_Array (1 .. 3);
-      Last       : Ada.Streams.Stream_Element_Offset;
+      Dummy_Last : Ada.Streams.Stream_Element_Offset;
    begin
       S.Set_Address (Buffer'Address);
       S.Set_Length (Buffer'Length);
-      S.Read (Out_Buffer, Last);
+      S.Read (Out_Buffer, Dummy_Last);
       begin
-         S.Read (Out_Buffer, Last);
+         S.Read (Out_Buffer, Dummy_Last);
          Assert (True, "Could Read past endof buffer");
       exception
          when Ada.IO_Exceptions.End_Error =>
@@ -143,22 +143,22 @@ package body Stream_Tools.Tests.Memory_Stream_Tests is
       S          : aliased Memory_Stream;
       Buffer     : aliased Stream_Element_Array (1 .. 4)             := (0, 1, 2, 3);
       Out_Buffer : aliased Ada.Streams.Stream_Element_Array (1 .. 3) := (others => 16#CA#);
-      Last       : Ada.Streams.Stream_Element_Offset;
+      Dummy_Last       : Ada.Streams.Stream_Element_Offset;
    begin
       S.Set_Address (Buffer'Address);
       S.Set_Length (Buffer'Length);
 
-      S.Read (Out_Buffer, Last);
+      S.Read (Out_Buffer, Dummy_Last);
       Assert (Out_Buffer = (0, 1, 2), "Wrong Data");
       S.Set_End_Of_File_Stretegy (To => Return_Remaing_Data_Or_Raise);
       Out_Buffer := (others => 16#FF#);
-      S.Read (Out_Buffer, Last);
+      S.Read (Out_Buffer, Dummy_Last);
       Assert
         (Out_Buffer = (3, 16#FF#, 16#FF#),
          "Wrong Data got [" & Image (Out_Buffer) & "] expected [" & Image ((3, 16#FF#, 16#FF#)) & "]");
-      Assert (Last = Out_Buffer'First, "Wrong amount read, expexted last to be :  1 Got : " & Last'Img);
+      Assert (Dummy_Last = Out_Buffer'First, "Wrong amount read, expexted last to be :  1 Got : " & Dummy_Last'Img);
       begin
-         S.Read (Out_Buffer, Last);
+         S.Read (Out_Buffer, Dummy_Last);
          Assert (True, "Could Read from empty buffer");
       exception
          when Ada.IO_Exceptions.End_Error =>

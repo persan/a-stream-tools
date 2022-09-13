@@ -177,8 +177,8 @@ package body Stream_Tools.Memory_Streams is
    begin
       Ada.Streams.Stream_Element_Offset'Read (This, Initial_Size);
       Expand_Strategy'Read (This, Strategy);
-      return Ret : Dynamic_Memory_Stream (Initial_Size, Strategy) do
-         Ada.Streams.Stream_Element_Array'Write (This, Ret.Buffer.As_Large_Buffer_Access.all (0 .. Initial_Size - 1));
+      return Dummy_Ret : Dynamic_Memory_Stream (Initial_Size, Strategy) do
+         Ada.Streams.Stream_Element_Array'Write (This, Dummy_Ret.Buffer.As_Large_Buffer_Access.all (0 .. Initial_Size - 1));
       end return;
    end Input_Dynamic_Memory_Stream;
 
@@ -272,6 +272,7 @@ package body Stream_Tools.Memory_Streams is
    procedure Dump
      (This : Memory_Stream; To : not null access Ada.Streams.Root_Stream_Type'Class; Full_Buffer : Boolean := False)
    is
+      pragma Unreferenced (Full_Buffer);
       First_Char : Boolean := True;
    begin
       for C of This.Buffer.As_Large_Buffer_Access.all (This.Buffer.As_Large_Buffer_Access.all'First .. This.Cursor - 1) loop

@@ -76,7 +76,12 @@ project Stream_Tools is
                                         "-gnatf", --    Full errors. Verbose details, all undefined references
                                         "-gnatq",  --   Don't quit, try semantics, even if parse errors
                                         "-gnatQ",  --   Don't quit, write ali/tree file even if compile errors
-                                        "-gnatwa", --   Turn on most Warnings
+                                        "-gnatw.e", --   Turn on all Warnings
+                                        "-gnatw.Y",
+                                        "-gnatwD",
+                                        "-gnatw.N",
+                                        "-gnatwH",
+                                        "-gnatwM",
                                         "-gnaty3", --   check indentation
                                         "-gnatya", --   check attribute casing
                                         "-gnatyA", --   check array attribute indexes

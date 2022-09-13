@@ -18,6 +18,7 @@ package body Stream_Tools.Generic_Classwide_Ring is
    -------------
 
    function Advance (Cont : Ring_Buffer; Position : Cursor) return Cursor is
+      pragma Unreferenced (Cont);
    begin
       return Position;
    end Advance;
@@ -27,6 +28,7 @@ package body Stream_Tools.Generic_Classwide_Ring is
    ------------------------
 
    function Cursor_Has_Element (Cont : Ring_Buffer; Position : Cursor) return Boolean is
+      pragma Unreferenced (Position);
    begin
       return not Cont.End_Of_File;
    end Cursor_Has_Element;
@@ -36,6 +38,7 @@ package body Stream_Tools.Generic_Classwide_Ring is
    -----------------
 
    function Get_Element (Cont : Ring_Buffer; Position : Cursor) return T'Class is
+      pragma Unreferenced (Position);
       S : constant access Ring_Buffer := Cont'Unrestricted_Access;
    begin
       return S.Input;

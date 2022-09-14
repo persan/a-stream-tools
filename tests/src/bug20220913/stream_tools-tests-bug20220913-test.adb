@@ -37,7 +37,6 @@ package body Stream_Tools.Tests.BUG20220913.Test is
          S.Set_Length (Buffer'Length);
          S.Reset;
          Stream_Tools.Tests.BUG20220913.Eth.Messages.Root_Message_Type'Class'Output (S'Access, Data);
-         S.Dump;
       end Write_Memory_Stream;
 
       Message        : aliased Stream_Tools.Tests.BUG20220913.Eth.Messages.Command_Jak.Command_Jak_Message;

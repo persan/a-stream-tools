@@ -31,7 +31,7 @@ project Stream_Tools is
    type Boolean is ("True", "False");
 
 
-   Library_Type : Library_Type_Kind  := external ("STREAM_TOOLS_LIBRARY_TYPE", "static");
+   Library_Type : Library_Type_Kind  := external ("STREAM_TOOLS_LIBRARY_TYPE", external("LIBRARY_TYPE","static"));
 
    for Languages use ("Ada");
 

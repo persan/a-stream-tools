@@ -4,12 +4,13 @@ _project=stream_tools
 -include Makefile.conf
 
 PREFIX?=$(shell dirname $(shell dirname $(shell which gnatls)))
-
+export PATH:=${PREFIX}/bin:${PATH}
 
 all:compile
 
 Makefile.conf:Makefile
 	echo "GPRINSTALL=$(shell which gprinstall)" >${@}
+
 
 
 help:
@@ -47,9 +48,12 @@ tag:tag-check
 	git tag -f "$(shell bin/version --version)-$(shell bin/version --date)"
 	${MAKE} dist
 	git push --tag
+	
+GPRINST_OPTS=-f -p ${GPROPTS} --prefix=${PREFIX} --install-name=${_project} 	--build-var=LIBRARY_TYPE
 
 install:uninstall
-	${GPRINSTALL} --prefix=${PREFIX}  -p -P ${_project}
+	${GPRINSTALL} -XLIBRARY_TYPE=static      ${GPRINST_OPTS} --build-name=static      ${_project}.gpr
+	${GPRINSTALL} -XLIBRARY_TYPE=relocatable ${GPRINST_OPTS} --build-name=relocatable ${_project}.gpr
 
 
 uninstall: # IGNORE

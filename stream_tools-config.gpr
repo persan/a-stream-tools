@@ -25,7 +25,7 @@
 
 with "stream_tools.gpr";
 project Stream_Tools.Config is
-   for Languages use ("Makefile", "Text", "Python");
+   for Languages use ("Makefile",  "Python");
    for Source_Dirs use (".","tools");
 
    package Builder        renames Stream_Tools.Builder;

@@ -32,7 +32,7 @@ package body Stream_Tools.Tests.Bufferd_Stream_Tests is
    procedure Test_Simple (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);
       B : aliased Stream_Tools.Pipes.Pipe (11);
-      I : Ada.Streams.Stream_Element_Array (1 .. 4) := (others => 0);
+      I : Ada.Streams.Stream_Element_Array (1 .. 4) := [others => 0];
 
    begin
       Short_Short_Integer'Write (B'Access, 1);
@@ -42,33 +42,33 @@ package body Stream_Tools.Tests.Bufferd_Stream_Tests is
       Short_Short_Integer'Write (B'Access, 5);
       Short_Short_Integer'Write (B'Access, 6);
 
-      I := (others => 0);
+      I := [others => 0];
       Ada.Streams.Stream_Element_Array'Read (B'Access, I);
-      Assert (I = (1, 2, 3, 4), "");
+      Assert (I = [1, 2, 3, 4], "");
       Short_Short_Integer'Write (B'Access, 7);
       Short_Short_Integer'Write (B'Access, 8);
 
-      I := (others => 0);
+      I := [others => 0];
       Ada.Streams.Stream_Element_Array'Read (B'Access, I);
-      Assert (I = (5, 6, 7, 8), "");
+      Assert (I = [5, 6, 7, 8], "");
 
       Short_Short_Integer'Write (B'Access, 1);
       Short_Short_Integer'Write (B'Access, 2);
       Short_Short_Integer'Write (B'Access, 3);
       Short_Short_Integer'Write (B'Access, 4);
-      I := (others => 0);
+      I := [others => 0];
       Ada.Streams.Stream_Element_Array'Read (B'Access, I);
-      --     Assert (I = (1, 2, 3, 4), "");
+      --     Assert (I = [1, 2, 3, 4], "");
 
       Short_Short_Integer'Write (B'Access, 1);
       Short_Short_Integer'Write (B'Access, 2);
       Short_Short_Integer'Write (B'Access, 3);
       Short_Short_Integer'Write (B'Access, 4);
-      I := (others => 0);
+      I := [others => 0];
       Ada.Streams.Stream_Element_Array'Read (B'Access, I);
-      Assert (I = (1, 2, 3, 4), "");
-      I := (1, 2, 3, 4);
-      --  Stream_Element_Array'Write (B'Access, Stream_Element_Array'(1, 2, 3, 4));
+      Assert (I = [1, 2, 3, 4], "");
+      I := [1, 2, 3, 4];
+      --  Stream_Element_Array'Write (B'Access, Stream_Element_Array'[1, 2, 3, 4]);
       Stream_Element_Array'Write (B'Access, I);
    end Test_Simple;
 

@@ -88,7 +88,7 @@ private
       procedure Close;
 
    private
-      Buffer       : Ada.Streams.Stream_Element_Array (1 .. Capacity) := (others => 16#CA#);
+      Buffer       : Ada.Streams.Stream_Element_Array (1 .. Capacity) := [others => 16#CA#];
       Count        : Ada.Streams.Stream_Element_Offset := 0;
       In_Cursor    : Ada.Streams.Stream_Element_Offset := 1;
       Out_Cursor   : Ada.Streams.Stream_Element_Offset := 1;

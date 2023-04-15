@@ -7,15 +7,15 @@ package Stream_Tools.Tests.Generic_Classwide_Ring  is
    end record;
 
    type AB is new A with record
-      Data_B : String (1 .. 5) := (others => '-');
+      Data_B : String (1 .. 5) := [others => '-'];
    end record;
 
    type AA is new A with record
-      Data_AA : String (1 .. 5) := (others => '#');
+      Data_AA : String (1 .. 5) := [others => '#'];
    end record;
 
    type ABA is new AB with record
-      Data_BA : String (1 .. 5) := (others => '+');
+      Data_BA : String (1 .. 5) := [others => '+'];
    end record;
 
    package Ring is new Stream_Tools.Generic_Classwide_Ring (A);

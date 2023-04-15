@@ -66,7 +66,7 @@ package body Stream_Tools.Timed_Streams is
       begin
          GNAT.Regpat.Match (M, Line, Matches);
          if Matches (Matches'First) /= No_Match then
-            Stream.Buffer.Append ((To_Time_Span (Duration'Value (Line (Matches (1).First .. Matches (1).Last))),
+            Stream.Buffer.Append (Simple_Event'(To_Time_Span (Duration'Value (Line (Matches (1).First .. Matches (1).Last))),
                                   Stream_Element'Value (Line (Matches (2).First .. Matches (2).Last))));
          end if;
       end Read;
@@ -123,7 +123,7 @@ package body Stream_Tools.Timed_Streams is
      (Stream : in out Timed_Stream;
       Item   : Ada.Streams.Stream_Element) is
    begin
-      Stream.Buffer.Append ((Ada.Real_Time.Clock - Stream.Start_Time, Item));
+      Stream.Buffer.Append (Simple_Event'(Ada.Real_Time.Clock - Stream.Start_Time, Item));
    end Write;
 
    not overriding procedure Read

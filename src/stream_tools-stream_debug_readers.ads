@@ -38,8 +38,8 @@ package Stream_Tools.Stream_Debug_Readers is
    --  Not Printable will be displayed as '.'.
 
    Printable : constant array (Character) of Boolean
-     := (ASCII.LF | ASCII.CR | ASCII.HT | ASCII.VT | ' ' .. '~' => True,
-         others                                                 => False);
+     := [ASCII.LF | ASCII.CR | ASCII.HT | ASCII.VT | ' ' .. '~' => True,
+         others                                                 => False];
 
 private
 

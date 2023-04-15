@@ -1,3 +1,4 @@
+pragma Ada_2022;
 -------------------------------------------------------------------------------
 --                                                                           --
 --  Copyright 2016 Per Sandberg <per.s.sandberg@bahnhof.se>                  --
@@ -298,10 +299,10 @@ package body Stream_Tools.Memory_Streams is
      (This : Memory_Stream; To : not null access Ada.Streams.Root_Stream_Type'Class; Full_Buffer : Boolean := False)
    is
       Data : Stream_Element_Array renames
-        This.Buffer.As_Large_Buffer_Access.all
-          (This.Buffer.As_Large_Buffer_Access.all'First ..
-               (if Full_Buffer then This.Buffer.As_Large_Buffer_Access.all'First + This.Get_Length else This.Pos - 1));
-      Pos : Natural := 0;
+               This.Buffer.As_Large_Buffer_Access.all
+                 (This.Buffer.As_Large_Buffer_Access.all'First ..
+                    (if Full_Buffer then This.Buffer.As_Large_Buffer_Access.all'First + This.Get_Length else This.Pos - 1));
+      Pos  : Natural := 0;
    begin
       String'Write (To, "(");
       for C of Data loop
@@ -318,5 +319,47 @@ package body Stream_Tools.Memory_Streams is
       end loop;
       String'Write (To, ");");
    end As_Source;
+
+   procedure Put_Image
+     (S : in out Ada.Strings.Text_Buffers.Root_Buffer_Type'Class; This : Memory_Stream) is
+      First : Boolean := True;
+      Count : Natural := 0;
+   begin
+      S.Put ("[");
+      for I of This.Buffer.As_Large_Buffer_Access.all (0 .. This.Cursor - 1) loop
+         if not First then
+            if Count mod 16 = 0 then
+               S.Put ("," & ASCII.LF & ' ');
+            else
+               S.Put (", ");
+            end if;
+         else
+            First := False;
+         end if;
+         Count := Count + 1;
+         S.Put (Image (I, True));
+      end loop;
+      S.Put ("]");
+   end Put_Image;
+
+   function Constant_Reference
+     (Container : aliased Memory_Stream;
+      Position  : Ada.Streams.Stream_Element_Offset) return Constant_Reference_Type is
+   begin
+      if Position > Container.Get_Length then
+         raise Constraint_Error with "Index out of bounds";
+      end if;
+      return Constant_Reference_Type'(Element => Container.Buffer.As_Large_Buffer_Access (Position - 1)'Access);
+   end Constant_Reference;
+
+   function Reference
+     (Container : aliased in out Memory_Stream;
+      Position  : Ada.Streams.Stream_Element_Offset) return Reference_Type is
+   begin
+      if Position > Container.Get_Length then
+         raise Constraint_Error with "Index out of bounds";
+      end if;
+      return Reference_Type'(Element => Container.Buffer.As_Large_Buffer_Access (Position - 1)'Unrestricted_Access);
+   end Reference;
 
 end Stream_Tools.Memory_Streams;

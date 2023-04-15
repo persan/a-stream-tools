@@ -1,3 +1,4 @@
+pragma Ada_2022;
 -------------------------------------------------------------------------------
 --                                                                           --
 --  Copyright 2016 Per Sandberg <per.s.sandberg@bahnhof.se>                  --
@@ -27,6 +28,7 @@ with Ada.Streams;
 with System;
 with Ada.Finalization;
 with GNAT.Sockets;
+private with Ada.Strings.Text_Buffers;
 package Stream_Tools.Memory_Streams is
    use Ada;
    --  Memory_Streams implements stream functionality to be mapped to any
@@ -102,7 +104,9 @@ package Stream_Tools.Memory_Streams is
 
    type Memory_Stream is limited new Ada.Streams.Root_Stream_Type
      and Memory_Stream_Interface
-   with private;
+   with private with
+     Constant_Indexing => Constant_Reference,
+     Variable_Indexing => Reference;
 
    procedure Read_Memory_Stream
      (This : not null access Ada.Streams.Root_Stream_Type'Class;
@@ -215,6 +219,25 @@ package Stream_Tools.Memory_Streams is
       Flags  : GNAT.Sockets.Request_Flag_Type := GNAT.Sockets.No_Request_Flag);
    --  Sends the whole contents of the stored Stream to a socket.
 
+   type Constant_Reference_Type
+      (Element : not null access constant Ada.Streams.Stream_Element) is private
+   with
+      Implicit_Dereference => Element;
+
+   type Reference_Type (Element : not null access Ada.Streams.Stream_Element) is private
+   with
+       Implicit_Dereference => Element;
+
+   function Constant_Reference
+     (Container : aliased Memory_Stream;
+      Position  : Ada.Streams.Stream_Element_Offset) return Constant_Reference_Type;
+   pragma Inline (Constant_Reference);
+
+   function Reference
+     (Container : aliased in out Memory_Stream;
+      Position  : Ada.Streams.Stream_Element_Offset) return Reference_Type;
+   pragma Inline (Reference);
+
    type Expand_Strategy is (As_Needed,
                             Multiply_By_Two,
                             Add_Initial_Size);
@@ -275,7 +298,10 @@ private
       Buffer_Length  : Streams.Stream_Element_Count  := 0;
       Cursor         : Streams.Stream_Element_Offset := 0;
       On_End_Of_File :  End_Of_File_Stretegy := Raise_End_Of_File_Exception;
-   end record;
+   end record with Put_Image => Put_Image;
+
+   procedure Put_Image
+     (S : in out Ada.Strings.Text_Buffers.Root_Buffer_Type'Class; This : Memory_Stream);
 
    type Controler (Controled : not null access Dynamic_Memory_Stream)
    is new Ada.Finalization.Limited_Controlled with null record;
@@ -295,5 +321,8 @@ private
    procedure Expand
      (This    : in out Dynamic_Memory_Stream;
       To_Size : Ada.Streams.Stream_Element_Offset);
+   type Constant_Reference_Type (Element : not null access constant Ada.Streams.Stream_Element) is null record;
+
+   type Reference_Type (Element : not null access Ada.Streams.Stream_Element) is null record;
 
 end Stream_Tools.Memory_Streams;

@@ -1,3 +1,4 @@
+pragma Ada_2022;
 with Stream_Tools.Memory_Streams;
 with Ada.Streams;
 with AUnit.Assertions;
@@ -40,6 +41,9 @@ package body Stream_Tools.Tests.Memory_Stream_Tests is
       Register_Routine (T, Test_Size'Access, "Test_Size");
       Register_Routine (T, Test_As_String'Access, "Test_As_String");
       Register_Routine (T, Test_As_Source'Access, "Test_As_Source");
+      Register_Routine (T, Test_Indexining'Access, "Test_Indexining");
+      Register_Routine (T, Test_Image'Access, "Test_Image");
+
    end Register_Tests;
 
    ----------
@@ -100,7 +104,7 @@ package body Stream_Tools.Tests.Memory_Stream_Tests is
       pragma Unreferenced (T);
       S          : aliased Stream_Tools.Memory_Streams.Memory_Stream;
       Buffer     : aliased Ada.Streams.Stream_Element_Array (1 .. 4);
-      Out_Buffer : aliased constant Ada.Streams.Stream_Element_Array (1 .. 4) := (1, 2, 3, 4);
+      Out_Buffer : aliased constant Ada.Streams.Stream_Element_Array (1 .. 4) := [1, 2, 3, 4];
    begin
       S.Set_Address (Buffer'Address);
       S.Set_Length (Buffer'Length);
@@ -119,7 +123,7 @@ package body Stream_Tools.Tests.Memory_Stream_Tests is
    procedure Test_Read_Element_Array_2 (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);
       S          : aliased Stream_Tools.Memory_Streams.Memory_Stream;
-      Buffer     : aliased Ada.Streams.Stream_Element_Array (1 .. 4) := (0, 1, 2, 3);
+      Buffer     : aliased Ada.Streams.Stream_Element_Array (1 .. 4) := [0, 1, 2, 3];
       Out_Buffer : aliased Ada.Streams.Stream_Element_Array (1 .. 3);
       Dummy_Last : Ada.Streams.Stream_Element_Offset;
    begin
@@ -141,21 +145,21 @@ package body Stream_Tools.Tests.Memory_Stream_Tests is
    procedure Test_Read_Element_Array_3 (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);
       S          : aliased Memory_Stream;
-      Buffer     : aliased Stream_Element_Array (1 .. 4)             := (0, 1, 2, 3);
-      Out_Buffer : aliased Ada.Streams.Stream_Element_Array (1 .. 3) := (others => 16#CA#);
+      Buffer     : aliased Stream_Element_Array (1 .. 4)             := [0, 1, 2, 3];
+      Out_Buffer : aliased Ada.Streams.Stream_Element_Array (1 .. 3) := [others => 16#CA#];
       Dummy_Last       : Ada.Streams.Stream_Element_Offset;
    begin
       S.Set_Address (Buffer'Address);
       S.Set_Length (Buffer'Length);
 
       S.Read (Out_Buffer, Dummy_Last);
-      Assert (Out_Buffer = (0, 1, 2), "Wrong Data");
+      Assert (Out_Buffer = [0, 1, 2], "Wrong Data");
       S.Set_End_Of_File_Stretegy (To => Return_Remaing_Data_Or_Raise);
-      Out_Buffer := (others => 16#FF#);
+      Out_Buffer := [others => 16#FF#];
       S.Read (Out_Buffer, Dummy_Last);
       Assert
-        (Out_Buffer = (3, 16#FF#, 16#FF#),
-         "Wrong Data got [" & Image (Out_Buffer) & "] expected [" & Image ((3, 16#FF#, 16#FF#)) & "]");
+        (Out_Buffer = [3, 16#FF#, 16#FF#],
+         "Wrong Data got [" & Image (Out_Buffer) & "] expected [" & Image ([3, 16#FF#, 16#FF#]) & "]");
       Assert (Dummy_Last = Out_Buffer'First, "Wrong amount read, expexted last to be :  1 Got : " & Dummy_Last'Img);
       begin
          S.Read (Out_Buffer, Dummy_Last);
@@ -230,9 +234,9 @@ package body Stream_Tools.Tests.Memory_Stream_Tests is
       pragma Unreferenced (T);
       S1       : aliased Memory_Stream;
       S2       : aliased Memory_Stream;
-      Buffer1  : aliased Stream_Element_Array (1 .. 10) := (others => 16#CA#);
-      Buffer2  : aliased Stream_Element_Array (1 .. 10) := (others => 16#FF#);
-      Expected : constant Stream_Element_Array := (1 => 16#44#, 2 => 16#33#, 3 => 16#22#, 4 => 16#11#, 5 .. 10 => 16#FF#);
+      Buffer1  : aliased Stream_Element_Array (1 .. 10) := [others => 16#CA#];
+      Buffer2  : aliased Stream_Element_Array (1 .. 10) := [others => 16#FF#];
+      Expected : constant Stream_Element_Array := [1 => 16#44#, 2 => 16#33#, 3 => 16#22#, 4 => 16#11#, 5 .. 10 => 16#FF#];
    begin
       S1.Set_Address (Buffer1'Address);
       S1.Set_Length (Buffer1'Length);
@@ -245,5 +249,45 @@ package body Stream_Tools.Tests.Memory_Stream_Tests is
       Memory_Stream'Write (S2'Access, S1);
       Assert (Buffer2 = Expected, "Got:" & Image (Buffer2) & " expected:" & Image (Expected));
    end Test_Size;
+   procedure Test_Indexining (T : in out Test_Cases.Test_Case'Class) is
+      pragma Unreferenced (T);
+      S1       : aliased Memory_Stream;
+      Buffer  : aliased Stream_Element_Array (1 .. 10) := [others => 16#00#];
+   begin
+      S1.Set_Address (Buffer'Address);
+      S1.Set_Length (Buffer'Length);
+      Buffer (1) := 2;
+      Buffer (10) := 10;
+      Assert (Buffer (1) = S1 (1), "Got:" & Image (S1 (1)) & " expected:" & Image (Buffer (1)));
+      Assert (Buffer (10) = S1 (10), "Got:" & Image (S1 (10)) & " expected:" & Image (Buffer (10)));
+      begin
+         S1 (11) := S1 (1);
+      exception
+         when Constraint_Error => null;
+      end;
+      begin
+         S1 (1) := S1 (11);
+      exception
+         when Constraint_Error => null;
+      end;
+   end Test_Indexining;
+   procedure Test_Image (T : in out Test_Cases.Test_Case'Class) is
+      pragma Unreferenced (T);
+      S1       : aliased Memory_Stream;
+      Buffer   : aliased Stream_Element_Array (1 .. 60) := [others => 16#00#];
+      Excpected_32 : constant String :=
+                       "[16#20#, 16#20#, 16#20#, 16#20#, 16#20#, 16#20#, 16#20#, 16#20#, 16#20#, 16#20#, 16#20#, 16#20#, 16#20#, 16#20#, 16#20#, 16#20#," & ASCII.LF &
+                       " 16#20#, 16#20#, 16#20#, 16#20#, 16#20#, 16#20#, 16#20#, 16#20#, 16#20#, 16#20#, 16#20#, 16#20#, 16#20#, 16#20#, 16#20#, 16#20#]";
+   begin
+      S1.Set_Address (Buffer'Address);
+      S1.Set_Length (Buffer'Length);
+      Assert (S1'Image = "[]", "Got:" & S1'Image & ", expected: []");
+      Character'Write (S1'Access, ' ');
+      Assert (S1'Image = "[16#20#]", "Got:" & S1'Image & ", expected: [16#20#]");
+      Character'Write (S1'Access, ' ');
+      Assert (S1'Image = "[16#20#, 16#20#]", "Got:" & S1'Image & ", expected: [16#20#, 16#20#]");
+      String'Write (S1'Access, "                              ");
+      Assert (S1'Image = Excpected_32, "Got:" & S1'Image & ", expected: " & Excpected_32);
+   end Test_Image;
 
 end Stream_Tools.Tests.Memory_Stream_Tests;

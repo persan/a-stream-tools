@@ -2,9 +2,9 @@ name: Ada (GNAT)
 
 on:
   push:
-    branches: [ master ]
+    branches: [ ubuntu-22.04 ]
   pull_request:
-    branches: [ master ]
+    branches: [ ubuntu-22.04 ]
 
 jobs:
   build:
@@ -21,4 +21,4 @@ jobs:
         sudo apt-get install gnat gprbuild libaunit*-dev libgnatcoll-*-dev
 
     - name: Build
-      run: gcc -v # make test
+      run: make test

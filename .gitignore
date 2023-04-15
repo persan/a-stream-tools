@@ -2,7 +2,6 @@ test-data2.txt
 lib
 version
 *.tgz
-.obj
 _
 _*
 Makefile.conf
@@ -12,5 +11,16 @@ auto.cgpr
 test.txt
 ada_crash_course
 *main
-.clang-format
+.clang*
 *#
+*.lexch
+*.o
+*.ali
+*.stderr
+*.stdout
+*.bexch
+*.cswi
+b__*
+gpsauto.cgpr
+messages.txt
+*-loc.xml

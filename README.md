@@ -20,12 +20,11 @@ Provides a set of utilities for streams such as:
    --  Write the whole serialized buffer in one transaction.
  end;
 `````
+This library reqires an Ada-22 compatible compiler.
 
 Tested with:
- * GNATPro 23.0w-20220621
- * GNATPro 21.0w-20200507
- * GNATPro 19.0
- * GCC 4.9.3(Raspian)
+ * GNATPro 23.1
+ * GCC 12.2.1
 
 Installation
 make

@@ -1,7 +1,39 @@
-pragma Ada_2012;
-with GNATCOLL.Locks;
+pragma Ada_2022;
 with Stream_Tools.Memory_Streams;
+with GNAT.Semaphores; use GNAT.Semaphores;
 package body Stream_Tools.Generic_Classwide_Ring is
+
+   package Locks is
+
+      subtype Mutual_Exclusion is Binary_Semaphore
+        (Initially_Available => True,
+         Ceiling             => Default_Ceiling);
+      type Scoped_Lock (Lock : access Mutual_Exclusion)
+      is new Ada.Finalization.Limited_Controlled with null record;
+      overriding procedure Initialize (This : in out Scoped_Lock);
+      overriding procedure Finalize   (This : in out Scoped_Lock);
+   end Locks;
+   package body Locks is
+
+      ----------------
+      -- Initialize --
+      ----------------
+
+      overriding procedure Initialize (This : in out Scoped_Lock) is
+      begin
+         This.Lock.Seize;
+      end Initialize;
+
+      --------------
+      -- Finalize --
+      --------------
+
+      overriding procedure Finalize (This : in out Scoped_Lock) is
+      begin
+         This.Lock.Release;
+      end Finalize;
+   end Locks;
+
    use Ada.Streams;
    ------------------
    -- First_Cursor --
@@ -49,8 +81,8 @@ package body Stream_Tools.Generic_Classwide_Ring is
    ------------
 
    procedure Output (S : access Ring_Buffer; Item : T'Class) is
-      Lock : GNATCOLL.Locks.Scoped_Lock (S.Lock'Access) with
-         Unreferenced;
+      Lock          : Locks.Scoped_Lock (S.Lock'Access) with
+        Unreferenced;
       Output_Buffer : aliased Stream_Tools.Memory_Streams.Memory_Stream;
    begin
       --  This construct is to force thw whole object to be "written" in one operation.
@@ -69,8 +101,8 @@ package body Stream_Tools.Generic_Classwide_Ring is
    -----------
 
    function Input (S : access Ring_Buffer) return T'Class is
-      Lock : GNATCOLL.Locks.Scoped_Lock (S.Lock'Access) with
-         Unreferenced;
+      Lock : Locks.Scoped_Lock (S.Lock'Access) with
+        Unreferenced;
    begin
       return T'Class'Input (S);
    end Input;
@@ -117,7 +149,7 @@ package body Stream_Tools.Generic_Classwide_Ring is
       S.Head := 0;
       S.Tail := 0;
       if Hard then
-         S.Buffer := (others => 0);
+         S.Buffer := [others => 0];
       end if;
    end Reset;
 

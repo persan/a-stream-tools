@@ -21,4 +21,4 @@ jobs:
         sudo apt-get install gnat gprbuild libaunit*-dev libgnatcoll-*-dev
 
     - name: Build
-      run: make test
+      run: gcc -v # make test

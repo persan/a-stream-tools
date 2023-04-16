@@ -1,4 +1,3 @@
-pragma Ada_2012;
 package body Stream_Tools.Tests.BUG20220913_Low_Defs is
 
    use type Ada.Streams.Stream_Element_Offset;

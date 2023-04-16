@@ -1,4 +1,3 @@
-pragma Ada_2022;
 with Stream_Tools.Memory_Streams;
 with Ada.Streams;
 with AUnit.Assertions;

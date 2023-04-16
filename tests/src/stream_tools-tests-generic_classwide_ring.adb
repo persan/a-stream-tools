@@ -1,4 +1,3 @@
-pragma Ada_2012;
 with AUnit.Assertions;
 with GNAT.Source_Info;
 package body Stream_Tools.Tests.Generic_Classwide_Ring is

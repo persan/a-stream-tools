@@ -1,4 +1,3 @@
-pragma Ada_2022;
 with Stream_Tools.Memory_Streams;
 with GNAT.Semaphores; use GNAT.Semaphores;
 package body Stream_Tools.Generic_Classwide_Ring is

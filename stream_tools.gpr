@@ -24,7 +24,7 @@
 -------------------------------------------------------------------------------
 project Stream_Tools is
 
-   Version := "1.2.1";
+   Version := "1.2.2";
 
    type Library_Type_Kind is ("static", "relocatable");
    type Boolean is ("True", "False");
@@ -39,7 +39,8 @@ project Stream_Tools is
    for Object_Dir use ".obj/" & project'Name & "/" & Library_Type;
    for Library_Dir use "lib";
    for Library_Name use "stream_tools";
-
+   for Shared_Library_Prefix use "lib";
+   for Shared_Library_Suffix use ".so";
    for Library_Version use project'Shared_Library_Prefix &
      project'Library_Name &
      project'Shared_Library_Suffix & "." & Version;

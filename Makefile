@@ -1,16 +1,10 @@
 #!/usr/bin/make gps -C
 _project=stream_tools
 
--include Makefile.conf
-
 PREFIX?=$(shell dirname $(shell dirname $(shell which gnatls)))
 export PATH:=${PREFIX}/bin:${PATH}
 
 all:compile
-
-Makefile.conf:Makefile
-	echo "GPRINSTALL=$(shell which gprinstall)" >${@}
-
 
 
 help:
@@ -52,13 +46,13 @@ tag:tag-check
 GPRINST_OPTS=-f -p ${GPROPTS} --prefix=${PREFIX} --install-name=${_project} 	--build-var=LIBRARY_TYPE
 
 install:uninstall
-	${GPRINSTALL} -XLIBRARY_TYPE=static      ${GPRINST_OPTS} --build-name=static      ${_project}.gpr
-	${GPRINSTALL} -XLIBRARY_TYPE=relocatable ${GPRINST_OPTS} --build-name=relocatable ${_project}.gpr
+	gprinstall -XLIBRARY_TYPE=static      ${GPRINST_OPTS} --build-name=static      ${_project}.gpr
+	gprinstall -XLIBRARY_TYPE=relocatable ${GPRINST_OPTS} --build-name=relocatable ${_project}.gpr
 
 
 uninstall: # IGNORE
 	-@if [ -n "$(shell gprinstall --prefix=${PREFIX} --list | grep ${_project})" ]; then \
-		${GPRINSTALL} --prefix=${PREFIX} --uninstall -P ${_project} 2>/dev/null 1>&2 ;\
+		gprinstall --prefix=${PREFIX} --uninstall -P ${_project} 2>/dev/null 1>&2 ;\
 	fi
 
 

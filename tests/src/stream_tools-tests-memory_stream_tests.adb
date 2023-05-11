@@ -37,6 +37,8 @@ package body Stream_Tools.Tests.Memory_Stream_Tests is
       Register_Routine (T, Test_Read_Element_Array_1'Access, "Test_Read_Element_Array_1");
       Register_Routine (T, Test_Read_Element_Array_2'Access, "Test_Read_Element_Array_2");
       Register_Routine (T, Test_Read_Element_Array_3'Access, "Test_Read_Element_Array_3");
+      Register_Routine (T, Test_Crc'Access, "Test_Crc");
+
       Register_Routine (T, Test_Size'Access, "Test_Size");
       Register_Routine (T, Test_As_String'Access, "Test_As_String");
       Register_Routine (T, Test_As_Source'Access, "Test_As_Source");
@@ -288,5 +290,40 @@ package body Stream_Tools.Tests.Memory_Stream_Tests is
       String'Write (S1'Access, "                              ");
       Assert (S1'Image = Excpected_32, "Got:" & S1'Image & ", expected: " & Excpected_32);
    end Test_Image;
+
+   procedure CRC_Sum (S : access Memory_Stream'Class; Data : Ada.Streams.Stream_Element_Array);
+
+   procedure CRC_Sum (S : access Memory_Stream'Class; Data : Ada.Streams.Stream_Element_Array) is
+      CRC : Ada.Streams.Stream_Element;
+   begin
+      CRC := Data'Reduce ("+", 0);
+      Ada.Streams.Stream_Element'Write (S, CRC);
+   end CRC_Sum;
+
+   procedure Test_Crc (T : in out Test_Cases.Test_Case'Class) is
+      pragma Unreferenced (T);
+      S1       : aliased Memory_Stream;
+      Buffer   : aliased Stream_Element_Array (1 .. 60) := [others => 16#00#];
+      Expected_1 : constant String := "[16#00#, 16#01#, 16#02#, 16#03#, 16#04#, 16#0A#]";
+      Expected_2 : constant String := "[16#FF#, 16#FF#, 16#FF#, 16#FD#]";
+      Expected_3 : constant String := "[16#F0#, 16#0F#, 16#04#, 16#FB#]";
+
+   begin
+      S1.Set_Address (Buffer'Address);
+      S1.Set_Length (Buffer'Length);
+      Ada.Streams.Stream_Element_Array'Write (S1'Access, [0, 1, 2, 3, 4]);
+      S1.Append_CRC (CRC_Sum'Access);
+      Assert (S1'Image = Expected_1, "Got:" & S1'Image & ", expected: " & Expected_1);
+
+      S1.Reset;
+      Ada.Streams.Stream_Element_Array'Write (S1'Access, [255, 255, 255]);
+      S1.Append_CRC (CRC_Sum'Access);
+      Assert (S1'Image = Expected_2, "Got:" & S1'Image & ", expected: " & Expected_2);
+      S1.Reset;
+
+      Ada.Streams.Stream_Element_Array'Write (S1'Access, [16#F0#, 16#0F#, 16#04#]);
+      S1.Append_CRC (XOR_CRC_Calculator'Access);
+      Assert (S1'Image = Expected_3, "Got:" & S1'Image & ", expected: " & Expected_3);
+   end Test_Crc;
 
 end Stream_Tools.Tests.Memory_Stream_Tests;

@@ -194,6 +194,15 @@ package Stream_Tools.Memory_Streams is
      (This   : in out Memory_Stream;
       Item   : Ada.Streams.Stream_Element_Array);
 
+   type CRC_Calculator is access procedure (This : access Memory_Stream'Class;
+                                            Data : Ada.Streams.Stream_Element_Array);
+
+   procedure XOR_CRC_Calculator (This : access Memory_Stream'Class;
+                                 Data : Ada.Streams.Stream_Element_Array);
+   procedure Append_CRC (This       : aliased in out Memory_Stream;
+                         Calculator : not null CRC_Calculator);
+   -- Uses the Calculator to calculate and append a CRC to the Stream.
+
    type End_Of_File_Stretegy is
      (Raise_End_Of_File_Exception, Return_Remaing_Data_Or_Raise)
      with

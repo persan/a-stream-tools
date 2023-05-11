@@ -361,4 +361,16 @@ package body Stream_Tools.Memory_Streams is
       return Reference_Type'(Element => Container.Buffer.As_Large_Buffer_Access (Position - 1)'Unrestricted_Access);
    end Reference;
 
+   procedure XOR_CRC_Calculator (This : access Memory_Stream'Class;
+                                 Data : Ada.Streams.Stream_Element_Array) is
+   begin
+      Ada.Streams.Stream_Element'Write (This, Data'Reduce ("xor", 0));
+   end XOR_CRC_Calculator;
+
+   procedure Append_CRC (This       : aliased in out Memory_Stream;
+                         Calculator : not null CRC_Calculator) is
+   begin
+      Calculator (This'Access, This.Buffer.As_Large_Buffer_Access.all (0 .. This.Cursor - 1));
+   end Append_CRC;
+
 end Stream_Tools.Memory_Streams;

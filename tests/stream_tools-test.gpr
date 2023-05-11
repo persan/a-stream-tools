@@ -2,7 +2,6 @@ with "gnatcoll.gpr";
 with "aunit";
 with "../stream_tools.gpr";
 with "../stream_tools-version.gpr";
-with "../stream_tools-config.gpr";
 
 project Stream_Tools.Test is
 

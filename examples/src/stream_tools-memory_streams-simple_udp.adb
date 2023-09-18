@@ -23,10 +23,9 @@
 --  OTHER DEALINGS IN THE SOFTWARE.                                          --
 -------------------------------------------------------------------------------
 
-with Stream_Tools.Memory_Streams;
 with Stream_Tools.Timed_Streams.Output;
 procedure Stream_Tools.Memory_Streams.Simple_UDP is
-   Real_Buffer : String (1 .. 1024) := (others => '#');
+   Real_Buffer : String (1 .. 1024) := [others => '#'];
    S           : aliased Stream_Tools.Memory_Streams.Memory_Stream;
    Outf        : aliased Stream_Tools.Timed_Streams.Output.Timed_Output_Stream;
 begin

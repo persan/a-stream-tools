@@ -25,6 +25,7 @@
 
 --                                                                          --
 ------------------------------------------------------------------------------
+pragma Ada_2022;
 with Ada.IO_Exceptions;
 with GNAT.Memory_Dump;
 with System.Memory;
@@ -363,8 +364,12 @@ package body Stream_Tools.Memory_Streams is
 
    procedure XOR_CRC_Calculator (This : access Memory_Stream'Class;
                                  Data : Ada.Streams.Stream_Element_Array) is
+      CRC : Stream_Element := 0;
    begin
-      Ada.Streams.Stream_Element'Write (This, Data'Reduce ("xor", 0));
+      for I of Data loop
+         CRC := CRC xor I;
+      end loop;
+      Stream_Element'Write (This, CRC);
    end XOR_CRC_Calculator;
 
    procedure Append_CRC (This       : aliased in out Memory_Stream;

@@ -91,7 +91,7 @@ package body Stream_Tools.Pipes is
         (Item   : out Ada.Streams.Stream_Element_Array;
          Last   : out Ada.Streams.Stream_Element_Offset;
          Caller : Ada.Task_Identification.Task_Id)
-        when Is_Closed or ((Count > 0)  and Data_Written)
+        when Is_Closed or (Count > 0  and Data_Written)
       is
          Split_1 : Ada.Streams.Stream_Element_Offset;
          Split_2 : Ada.Streams.Stream_Element_Offset;
@@ -137,7 +137,7 @@ package body Stream_Tools.Pipes is
       entry Write
         (Item   : Ada.Streams.Stream_Element_Array;
          Caller : Ada.Task_Identification.Task_Id)
-        when Is_Closed or ((Count < Capacity) and Data_Read)
+        when Is_Closed or (Count < Capacity and Data_Read)
       is
          Split_1 : Ada.Streams.Stream_Element_Offset;
          Split_2 : Ada.Streams.Stream_Element_Offset;

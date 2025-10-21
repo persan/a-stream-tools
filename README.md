@@ -23,7 +23,7 @@ Provides a set of utilities for streams such as:
 This library reqires an Ada-22 compatible compiler.
 
 Tested with:
- * GNATPro 23.1
+ * GNATPro 23.1, 26.0
  * GCC 12.2.1
 
 Installation

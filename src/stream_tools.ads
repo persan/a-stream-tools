@@ -25,8 +25,8 @@
 package Stream_Tools is
    pragma Pure;
 
-   Version      : constant String := "1.2.4";
-   Version_Date : constant String := "2023-11-08";
+   Version      : constant String := "1.2.6";
+   Version_Date : constant String := "2026-09-11";
    Oversized_Write : exception;
    Oversized_Read  : exception;
 end Stream_Tools;

@@ -1,0 +1,49 @@
+name = "stream_tools"
+description = "Utility stream types: memory streams, pipes, buffered and timed streams"
+long-description = """
+Stream_Tools provides a set of utilities built on Ada streams:
+
+* Memory_Streams: streams mapped to any memory location, to serialize
+  to memory and send the whole buffer as a single transaction. Includes
+  dynamic (self-expanding) memory streams, CRC helpers, hex dump and
+  source rendering of buffer contents, and indexing
+  (Constant_Indexing / Variable_Indexing).
+* Pipes: stream FIFOs.
+* Timed_Streams: recording streams that save output to a file with
+  timestamps.
+* Generic_Classwide_Ring: a bounded, thread-safe ring buffer of
+  classwide objects with iterator support.
+
+Requires an Ada 2022 compatible compiler. Tested with GNAT Pro 23.1,
+26.0, 26.1 and 27.0w.
+"""
+version = "1.2.6"
+licenses = "BSD-3-Clause"
+website = "https://github.com/persan/a-stream-tools"
+
+authors = ["Per Sandberg"]
+maintainers = ["Per Sandberg <per.s.sandberg@bahnhof.se>"]
+maintainers-logins = ["persan"]
+tags = ["stream", "memory-stream", "buffer", "serialization"]
+
+project-files = ["stream_tools.gpr"]
+
+[build-switches]
+development.compile_checks = "errors"
+validation.runtime_checks = "everything"
+release.optimization = "performance"
+
+# Test-only dependency (AUnit framework, used by tests/).
+# The compiler itself is not pinned as a crate dependency: Alire picks
+# the configured toolchain (alr toolchain), which may be an external
+# GNAT Pro install that the "gnat" meta-crate cannot represent.
+[[depends-on]]
+aunit = "^26.0"
+
+[[actions]]
+type = "test"
+command = ["make", "-C", "tests"]
+
+[origin]
+commit = ""
+url = "git+https://github.com/persan/a-stream-tools.git"

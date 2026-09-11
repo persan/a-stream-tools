@@ -343,7 +343,7 @@ package body Stream_Tools.Memory_Streams is
    end Put_Image;
 
    function Constant_Reference
-     (Container : aliased Memory_Stream;
+     (Container : aliased Memory_Stream'class;
       Position  : Ada.Streams.Stream_Element_Offset) return Constant_Reference_Type is
    begin
       if Position > Container.Get_Length then
@@ -353,7 +353,7 @@ package body Stream_Tools.Memory_Streams is
    end Constant_Reference;
 
    function Reference
-     (Container : aliased in out Memory_Stream;
+     (Container : aliased in out Memory_Stream'class;
       Position  : Ada.Streams.Stream_Element_Offset) return Reference_Type is
    begin
       if Position > Container.Get_Length then

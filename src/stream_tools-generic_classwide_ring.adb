@@ -49,9 +49,17 @@ package body Stream_Tools.Generic_Classwide_Ring is
    -------------
 
    function Advance (Cont : Ring_Buffer; Position : Cursor) return Cursor is
-      pragma Unreferenced (Cont);
+      pragma Unreferenced (Position);
    begin
-      return Position;
+      --  Do not "return Position": copying the parameter's access
+      --  discriminant into the return object makes its accessibility
+      --  level that of Position (deeper than the caller's), which
+      --  trips the RM 3.10.2 accessibility check at run time.
+      --  Rebuild the cursor from Cont instead; Position is not used.
+      return
+        Cursor'(C => Cont'Unrestricted_Access,
+                Controll => (Ada.Finalization.Controlled
+                               with C => Cont'Unrestricted_Access));
    end Advance;
 
    ------------------------

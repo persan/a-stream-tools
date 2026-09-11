@@ -45,5 +45,5 @@ type = "test"
 command = ["make", "-C", "tests"]
 
 [origin]
-commit = ""
+commit = "ddee5ae8d550d96b44738cfc267e0f5731132f63"
 url = "git+https://github.com/persan/a-stream-tools.git"
